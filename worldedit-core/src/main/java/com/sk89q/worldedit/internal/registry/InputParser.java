@@ -43,11 +43,11 @@ public abstract class InputParser<E> {
     public abstract E parseFromInput(String input, ParserContext context) throws InputParseException;
 
     /**
-     * Gets a list of suggestions of input to this parser.
+     * Gets a stream of suggestions of input to this parser.
      *
-     * @return a list of suggestions
+     * @return a stream of suggestions
      */
-    public List<String> getSuggestions() {
-        return Collections.emptyList();
+    public Stream<String> getSuggestions(String input) {
+        return Stream.empty();
     }
 }

@@ -306,9 +306,17 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
     }
 
     @Override
+    public void shift(BlockVector3 change) throws RegionOperationException {
+        pos1 = pos1.add(change);
+        pos2 = pos2.add(change);
+
+        recalculate();
+    }
+
+    @Override
     public Set<BlockVector2> getChunks() {
-    	BlockVector3 min = getMinimumPoint();
-    	BlockVector3 max = getMaximumPoint();
+        BlockVector3 min = getMinimumPoint();
+        BlockVector3 max = getMaximumPoint();
         final int maxX = max.getBlockX() >> ChunkStore.CHUNK_SHIFTS;
         final int minX = min.getBlockX() >> ChunkStore.CHUNK_SHIFTS;
         final int maxZ = max.getBlockZ() >> ChunkStore.CHUNK_SHIFTS;
@@ -328,7 +336,7 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
 
                     @Override
                     public BlockVector2 next() {
-                    	MutableBlockVector2 result = pos;
+                        MutableBlockVector2 result = pos;
                         // calc next
                         pos.setComponents(pos.getX() - 1, pos.getZ());
                         if (pos.getX() <= minX) {
@@ -357,7 +365,7 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
             @Override
             public boolean contains(Object o) {
                 if (o instanceof BlockVector2) {
-                	BlockVector2 cv = (BlockVector2) o;
+                    BlockVector2 cv = (BlockVector2) o;
                     return cv.getX() >= minX && cv.getX() <= maxX && cv.getZ() >= minZ && cv.getZ() <= maxZ;
                 } else {
                     return false;
@@ -365,12 +373,7 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
             }
         };
     }
-    public void shift(BlockVector3 change) throws RegionOperationException {
-        pos1 = pos1.add(change);
-        pos2 = pos2.add(change);
 
-        recalculate();
-    }
     @Override
     public Set<BlockVector3> getChunkCubes() {
         Set<BlockVector3> chunks = new BlockVectorSet();
@@ -388,7 +391,6 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
 
         return chunks;
     }
-
 
     @Override
     public boolean contains(int x, int y, int z) {
@@ -489,7 +491,6 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
         return new Iterator<BlockVector3>() {
             private BlockVector3 min = getMinimumPoint();
             private BlockVector3 max = getMaximumPoint();
-
             private int nextX = min.getBlockX();
             private int nextY = min.getBlockY();
             private int nextZ = min.getBlockZ();
@@ -545,12 +546,7 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
 
             @Override
             public BlockVector2 next() {
-                if (!hasNext()) throw new NoSuchElementException() {
-                    @Override
-                    public synchronized Throwable fillInStackTrace() {
-                        return this;
-                    }
-                };
+                if (!hasNext()) throw new NoSuchElementException();
                 BlockVector2 answer = BlockVector2.at(nextX, nextZ);
                 if (++nextX > max.getBlockX()) {
                     nextX = min.getBlockX();
@@ -592,15 +588,15 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
     }
 
     public static boolean contains(CuboidRegion region) {
-    	BlockVector3 min = region.getMinimumPoint();
-    	BlockVector3 max = region.getMaximumPoint();
+        BlockVector3 min = region.getMinimumPoint();
+        BlockVector3 max = region.getMaximumPoint();
         return region.contains(min.getBlockX(), min.getBlockY(), min.getBlockZ()) && region.contains(max.getBlockX(), max.getBlockY(), max.getBlockZ());
     }
 
     /**
      * Make a cuboid from the center.
      *
-     * @param origin  the origin
+     * @param origin the origin
      * @param apothem the apothem, where 0 is the minimum value to make a 1x1 cuboid
      * @return a cuboid region
      */

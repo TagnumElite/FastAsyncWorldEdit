@@ -41,6 +41,11 @@ public class DefaultItemParser extends InputParser<BaseItem> {
     }
 
     @Override
+    public Stream<String> getSuggestions(String input) {
+        return SuggestionHelper.getNamespacedRegistrySuggestions(ItemType.REGISTRY, input);
+    }
+
+    @Override
     public BaseItem parseFromInput(String input, ParserContext context) throws InputParseException {
         BaseItem item = null;
         // Legacy matcher
@@ -60,6 +65,12 @@ public class DefaultItemParser extends InputParser<BaseItem> {
                 }
             } catch (NumberFormatException ignored) {
             }
+        }
+
+        if ("hand".equalsIgnoreCase(input)) {
+            return getItemInHand(context.requireActor(), HandSide.MAIN_HAND);
+        } else if ("offhand".equalsIgnoreCase(input)) {
+            return getItemInHand(context.requireActor(), HandSide.OFF_HAND);
         }
 
         if (item == null) {
@@ -83,4 +94,5 @@ public class DefaultItemParser extends InputParser<BaseItem> {
             throw new InputParseException("The user is not a player!");
         }
     }
+
 }

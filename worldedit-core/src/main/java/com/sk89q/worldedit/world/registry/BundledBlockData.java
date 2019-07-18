@@ -47,7 +47,7 @@ import java.util.Map;
  * reading fails (which occurs when this class is first instantiated), then
  * the methods will return {@code null}s for all blocks.</p>
  */
-public class BundledBlockData {
+public final class BundledBlockData {
 
     private static final Logger log = LoggerFactory.getLogger(BundledBlockData.class);
     private static BundledBlockData INSTANCE;
@@ -73,20 +73,19 @@ public class BundledBlockData {
     private void loadFromResource() throws IOException {
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapter(Vector3.class, new VectorAdapter());
-        gsonBuilder.registerTypeAdapter(int.class, (JsonDeserializer<Integer>) (json, typeOfT, context) -> {
-            JsonPrimitive primitive = (JsonPrimitive) json;
-            if (primitive.isString()) {
-                String value = primitive.getAsString();
-                if (value.charAt(0) == '#') return Integer.parseInt(value.substring(1), 16);
-                return Integer.parseInt(value);
-            }
-            return primitive.getAsInt();
-        });
         Gson gson = gsonBuilder.create();
-        URL url = BundledBlockData.class.getResource("blocks.json");
+        URL url = null;
+        final int dataVersion = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).getDataVersion();
+        if (dataVersion > 1900) { // > MC 1.13
+            url = ResourceLoader.getResource(BundledBlockData.class, "blocks.114.json");
+        }
+        if (url == null) {
+            url = ResourceLoader.getResource(BundledBlockData.class, "blocks.json");
+        }
         if (url == null) {
             throw new IOException("Could not find blocks.json");
         }
+        log.debug("Using {} for bundled block data.", url);
         String data = Resources.toString(url, Charset.defaultCharset());
         List<BlockEntry> entries = gson.fromJson(data, new TypeToken<List<BlockEntry>>() {}.getType());
 

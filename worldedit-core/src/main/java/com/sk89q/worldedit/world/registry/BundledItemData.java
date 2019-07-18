@@ -47,7 +47,7 @@ import java.util.Map;
  * reading fails (which occurs when this class is first instantiated), then
  * the methods will return {@code null}s for all items.</p>
  */
-public class BundledItemData {
+public final class BundledItemData {
 
     private static final Logger log = LoggerFactory.getLogger(BundledItemData.class);
     private static BundledItemData INSTANCE;
@@ -74,10 +74,18 @@ public class BundledItemData {
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapter(Vector3.class, new VectorAdapter());
         Gson gson = gsonBuilder.create();
-        URL url = BundledItemData.class.getResource("items.json");
+        URL url = null;
+        final int dataVersion = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).getDataVersion();
+        if (dataVersion > 1900) { // > MC 1.13
+            url = ResourceLoader.getResource(BundledBlockData.class, "items.114.json");
+        }
+        if (url == null) {
+            url = ResourceLoader.getResource(BundledBlockData.class, "items.json");
+        }
         if (url == null) {
             throw new IOException("Could not find items.json");
         }
+        log.debug("Using {} for bundled item data.", url);
         String data = Resources.toString(url, Charset.defaultCharset());
         List<ItemEntry> entries = gson.fromJson(data, new TypeToken<List<ItemEntry>>() {}.getType());
 

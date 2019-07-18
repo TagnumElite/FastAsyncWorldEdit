@@ -44,16 +44,34 @@ public class BiomeMaskParser extends InputParser<Mask> {
     }
 
     @Override
+    public Stream<String> getSuggestions(String input) {
+        if (input.isEmpty()) {
+            return Stream.of("$");
+        }
+        if (input.charAt(0) == '$') {
+            input = input.substring(1);
+            final int lastTermIdx = input.lastIndexOf(',');
+            if (lastTermIdx <= 0) {
+                return SuggestionHelper.getNamespacedRegistrySuggestions(BiomeType.REGISTRY, input).map(s -> "$" + s);
+            }
+            String prev = input.substring(0, lastTermIdx) + ",";
+            Set<String> prevBiomes = Arrays.stream(prev.split(",", 0)).collect(Collectors.toSet());
+            String search = input.substring(lastTermIdx + 1);
+            return SuggestionHelper.getNamespacedRegistrySuggestions(BiomeType.REGISTRY, search)
+                    .filter(s -> !prevBiomes.contains(s)).map(s -> "$" + prev + s);
+        }
+        return Stream.empty();
+    }
+
+    @Override
     public Mask parseFromInput(String input, ParserContext context) throws InputParseException {
         if (!input.startsWith("$")) {
             return null;
         }
 
         Set<BiomeType> biomes = new HashSet<>();
-        BiomeRegistry biomeRegistry = worldEdit.getPlatformManager().queryCapability(Capability.GAME_HOOKS).getRegistries().getBiomeRegistry();
-        Collection<BiomeType> knownBiomes = BiomeType.REGISTRY.values();
         for (String biomeName : Splitter.on(",").split(input.substring(1))) {
-            BiomeType biome = Biomes.findBiomeByName(knownBiomes, biomeName, biomeRegistry);
+            BiomeType biome = BiomeType.REGISTRY.get(biomeName);
             if (biome == null) {
                 throw new InputParseException("Unknown biome '" + biomeName + '\'');
             }

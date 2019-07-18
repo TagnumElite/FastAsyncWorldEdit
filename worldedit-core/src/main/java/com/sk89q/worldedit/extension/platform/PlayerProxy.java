@@ -146,6 +146,11 @@ public class PlayerProxy extends AbstractPlayerActor {
     }
 
     @Override
+    public void print(Component component) {
+        basePlayer.print(component);
+    }
+
+    @Override
     public String[] getGroups() {
         return permActor.getGroups();
     }
@@ -153,6 +158,14 @@ public class PlayerProxy extends AbstractPlayerActor {
     @Override
     public boolean hasPermission(String perm) {
         return permActor.hasPermission(perm);
+    }
+
+    @Override public boolean togglePermission(String permission) {
+        return permActor.hasPermission(permission);
+    }
+
+    @Override public void setPermission(String permission, boolean value) {
+        permActor.setPermission(permission, value);
     }
 
     @Override

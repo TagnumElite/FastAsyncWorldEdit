@@ -116,16 +116,16 @@ public class DefaultPatternParser extends FaweParser<Pattern> {
 
 
                     if (charMask) {
-                        switch (char0) {
-                            case '$': {
-                                String value = command.substring(1) + ((entry.getValue().isEmpty()) ? "" : "[" + StringMan.join(entry.getValue(), "][") + "]");
-                                if (value.contains(":")) {
-                                    if (value.charAt(0) == ':') value.replaceFirst(":", "");
-                                    value = value.replaceAll(":", "][");
+                        if (char0 == '$') {
+                            String value = command.substring(1) + ((entry.getValue().isEmpty()) ? ""
+                                : "[" + StringMan.join(entry.getValue(), "][") + "]");
+                            if (value.contains(":")) {
+                                if (value.charAt(0) == ':') {
+                                    value.replaceFirst(":", "");
                                 }
-                                pattern = parseFromInput(char0 + "[" + value + "]", context);
-                                break;
+                                value = value.replaceAll(":", "][");
                             }
+                            pattern = parseFromInput(char0 + "[" + value + "]", context);
                         }
                     }
                     if (pattern == null) {
@@ -195,14 +195,14 @@ public class DefaultPatternParser extends FaweParser<Pattern> {
         }
         if (patterns.isEmpty()) {
             return null;
-        } else if (patterns.size() == 1) {
+        }
+        if (patterns.size() == 1) {
             return patterns.get(0);
-        } else {
-            RandomPattern random = new RandomPattern(new TrueRandom());
-            for (int i = 0; i < patterns.size(); i++) {
-                random.add(patterns.get(i), chances.get(i));
-            }
-            return random;
-            }
+        }
+        RandomPattern random = new RandomPattern(new TrueRandom());
+        for (int i = 0; i < patterns.size(); i++) {
+            random.add(patterns.get(i), chances.get(i));
+        }
+        return random;
     }
 }

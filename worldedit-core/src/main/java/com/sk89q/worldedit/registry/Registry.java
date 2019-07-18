@@ -32,7 +32,7 @@ import java.util.Set;
 
 import javax.annotation.Nullable;
 
-public class Registry<V> implements Iterable<V> {
+public class Registry<V extends Keyed> implements Iterable<V> {
     private final Map<String, V> map = new HashMap<>();
     private final String name;
 
@@ -40,7 +40,13 @@ public class Registry<V> implements Iterable<V> {
         this.name = name;
     }
 
-    public @Nullable V get(final String key) {
+    public String getName() {
+        return name;
+    }
+
+    @Nullable
+    public V get(final String key) {
+        checkState(key.equals(key.toLowerCase(Locale.ROOT)), "key must be lowercase");
         return this.map.get(key);
     }
 

@@ -81,9 +81,9 @@ public abstract class BreadthFirstSearch implements Operation {
     private BlockVector3[] directions;
     private BlockVectorSet visited;
     private BlockVectorSet queue;
+    private int affected = 0;
     private int currentDepth = 0;
     private final int maxDepth;
-    private int affected = 0;
     private int maxBranch = Integer.MAX_VALUE;
 
     /**
@@ -168,9 +168,9 @@ public abstract class BreadthFirstSearch implements Operation {
      * @param position the position
      */
     public void visit(BlockVector3 position) {
-        if (!visited.contains(position)) {
-            BlockVector3 blockVector = position;
-            isVisitable(blockVector, blockVector); // Ignore this, just to initialize mask on this point
+        BlockVector3 blockVector = position;
+        if (!visited.contains(blockVector)) {
+            isVisitable(position, position); // Ignore this, just to initialize mask on this point
             queue.add(blockVector);
             visited.add(blockVector);
         }
@@ -257,14 +257,15 @@ public abstract class BreadthFirstSearch implements Operation {
     }
 
     @Override
-    public void addStatusMessages(List<String> messages) {
-        messages.add(BBC.VISITOR_BLOCK.format(getAffected()));
-    }
-
-    @Override
     public void cancel() {
         queue.clear();
         visited.clear();
         affected = 0;
     }
+
+    @Override
+    public void addStatusMessages(List<String> messages) {
+        messages.add(BBC.VISITOR_BLOCK.format(getAffected()));
+    }
+
 }

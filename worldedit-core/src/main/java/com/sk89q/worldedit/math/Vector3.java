@@ -56,7 +56,7 @@ public class Vector3 {
 
     /**
      * Returns a comparator that sorts vectors first by Y, then Z, then X.
-     * 
+     *
      * <p>
      * Useful for sorting by chunk block storage order.
      */
@@ -632,7 +632,7 @@ public class Vector3 {
 
     @Override
     public int hashCode() {
-        return (((int) x) ^ (((int) z) << 12)) ^ (((int) y) << 24);
+        return (int) x ^ (int) z << 12 ^ (int) y << 24;
     }
 
     @Override

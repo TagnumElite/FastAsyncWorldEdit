@@ -26,7 +26,7 @@ public class ShadePattern extends AbstractPattern {
 
     @Override
     public BaseBlock apply(BlockVector3 position) {
-        BlockType block = extent.getBlockType(position);
+        BlockType block = extent.getBlock(position).getBlockType();
         return (darken ? util.getDarkerBlock(block) : util.getLighterBlock(block)).getDefaultState().toBaseBlock();
     }
 

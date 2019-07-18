@@ -162,6 +162,11 @@ public class BukkitPlayer extends AbstractPlayerActor {
     }
 
     @Override
+    public void print(Component component) {
+        TextAdapter.sendComponent(player, component);
+    }
+
+    @Override
     public void setPosition(Vector3 pos, float pitch, float yaw) {
         if (pos instanceof com.sk89q.worldedit.util.Location) {
             com.sk89q.worldedit.util.Location loc = (com.sk89q.worldedit.util.Location) pos;
@@ -191,7 +196,7 @@ public class BukkitPlayer extends AbstractPlayerActor {
 
     @Override
     public void setGameMode(GameMode gameMode) {
-        player.setGameMode(org.bukkit.GameMode.valueOf(gameMode.getId().toUpperCase()));
+        player.setGameMode(org.bukkit.GameMode.valueOf(gameMode.getId().toUpperCase(Locale.ROOT)));
     }
 
     @Override
@@ -199,6 +204,33 @@ public class BukkitPlayer extends AbstractPlayerActor {
         return (!plugin.getLocalConfiguration().noOpPermissions && player.isOp())
                 || plugin.getPermissionsResolver().hasPermission(
                         player.getWorld().getName(), player, perm);
+    }
+
+    @Override public boolean togglePermission(String permission) {
+        if (this.hasPermission(permission)) {
+            player.addAttachment(plugin).setPermission(permission, false);
+            return false;
+        } else {
+            player.addAttachment(plugin).setPermission(permission, true);
+            return true;
+        }
+    }
+
+    @Override
+    public void setPermission(String permission, boolean value) {
+        /*
+         *  Permissions are used to managing WorldEdit region restrictions
+         *   - The `/wea` command will give/remove the required bypass permission
+         */
+        if (Fawe.<FaweBukkit>imp().getVault() == null || Fawe.<FaweBukkit> imp().getVault().permission == null) {
+            player.addAttachment(Fawe.<FaweBukkit> imp().getPlugin()).setPermission(permission, value);
+        } else if (value) {
+            if (!Fawe.<FaweBukkit> imp().getVault().permission.playerAdd(player, permission)) {
+                player.addAttachment(Fawe.<FaweBukkit> imp().getPlugin()).setPermission(permission, value);
+            }
+        } else if (!Fawe.<FaweBukkit>imp().getVault().permission.playerRemove(player, permission)) {
+            player.addAttachment(Fawe.<FaweBukkit>imp().getPlugin()).setPermission(permission, value);
+        }
     }
 
     @Override

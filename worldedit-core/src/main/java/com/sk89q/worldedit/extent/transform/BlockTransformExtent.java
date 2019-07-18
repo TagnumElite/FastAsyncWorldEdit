@@ -58,7 +58,9 @@ import java.util.Map;
  * given transform.
  */
 public class BlockTransformExtent extends ResettableExtent {
+
     private Transform transform;
+
     private Transform transformInverse;
     private int[] BLOCK_ROTATION_BITMASK;
     private int[][] BLOCK_TRANSFORM;
@@ -386,19 +388,30 @@ public class BlockTransformExtent extends ResettableExtent {
         return transform;
     }
 
+    /**
+     * Transform a block without making a copy.
+     *
+     * @param block the block
+     * @param reverse true to transform in the opposite direction
+     * @return the same block
+     */
+    private <T extends BlockStateHolder<T>> T transformBlock(T block, boolean reverse) {
+        return transform(block, reverse ? transform.inverse() : transform);
+    }
+
     @Override
     public BlockState getBlock(BlockVector3 position) {
-        return transform(super.getBlock(position));
+        return transformBlock(super.getBlock(position), false);
     }
 
     @Override
     public BaseBlock getFullBlock(BlockVector3 position) {
-        return transform(super.getFullBlock(position));
+        return transformBlock(super.getFullBlock(position), false);
     }
 
     @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 location, B block) throws WorldEditException {
-        return super.setBlock(location, transformInverse(block));
+        return super.setBlock(location, transformBlock(block, true));
     }
 
     public void setTransform(Transform affine) {
@@ -416,7 +429,7 @@ public class BlockTransformExtent extends ResettableExtent {
      * @param transform the transform
      * @return the same block
      */
-    public static <B extends BlockStateHolder<B>> B transform(B block, Transform transform) {
+    public static <B extends BlockStateHolder<B>> B transform(@NotNull B block, @NotNull Transform transform) {
         // performance critical
         BlockState state = block.toImmutableState();
 
@@ -486,7 +499,4 @@ public class BlockTransformExtent extends ResettableExtent {
     public boolean setBlock(int x, int y, int z, BlockStateHolder block) throws WorldEditException {
         return super.setBlock(x, y, z, transformInverse(block));
     }
-
-
-
 }

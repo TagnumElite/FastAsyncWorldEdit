@@ -41,6 +41,11 @@ public class BlocksMaskParser extends InputParser<Mask> {
     }
 
     @Override
+    public Stream<String> getSuggestions(String input) {
+        return worldEdit.getBlockFactory().getSuggestions(input).stream();
+    }
+
+    @Override
     public Mask parseFromInput(String component, ParserContext context) throws InputParseException {
         ParserContext tempContext = new ParserContext(context);
         tempContext.setRestricted(false);

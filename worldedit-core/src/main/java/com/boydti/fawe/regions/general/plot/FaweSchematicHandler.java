@@ -92,7 +92,7 @@ public class FaweSchematicHandler extends SchematicHandler {
                     }
                 } else {
                     try (OutputStream stream = new FileOutputStream(tmp); BufferedOutputStream output = new BufferedOutputStream(new PGZIPOutputStream(stream))) {
-                        DataInputStream is = cTag.adapt(cTag.getSource());
+                        LZ4BlockInputStream is = cTag.adapt(cTag.getSource());
                         IOUtil.copy(is, stream);
                     }
                 }

@@ -132,8 +132,8 @@ public class EditSessionBuilder {
     }
 
     /**
-     * @param disk        If it should be stored on disk
-     * @param uuid        The uuid to store it under (if on disk)
+     * @param disk If it should be stored on disk
+     * @param uuid The uuid to store it under (if on disk)
      * @param compression Compression level (0-9)
      * @return
      */
@@ -207,11 +207,6 @@ public class EditSessionBuilder {
 
     public EditSessionBuilder blockBag(@Nullable BlockBag blockBag) {
         this.blockBag = blockBag;
-        return this;
-    }
-
-    public EditSessionBuilder eventBus(@Nullable EventBus eventBus) {
-        this.eventBus = eventBus;
         return this;
     }
 
@@ -420,6 +415,9 @@ public class EditSessionBuilder {
     }
 
     public EditSession build() {
+        if (eventBus == null) {
+            eventBus = WorldEdit.getInstance().getEventBus();
+        }
         return new EditSession(this);
     }
 

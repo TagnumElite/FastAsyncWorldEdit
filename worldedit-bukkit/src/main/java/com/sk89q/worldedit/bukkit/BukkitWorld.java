@@ -199,9 +199,9 @@ public class BukkitWorld extends AbstractWorld {
 
                         // We have to restore the block if it was outside
                         if (!region.contains(pt)) {
-                            editSession.smartSetBlock(pt, history[index]);
+                            editSession.setBlock(pt, history[index]);
                         } else { // Otherwise fool with history
-                            editSession.getChangeSet().add(new BlockChange(pt, history[index], editSession.getFullBlock(pt)));
+                            editSession.setBlock().add(new BlockChange(pt, history[index], editSession.getFullBlock(pt)));
                         }
                     }
                 }
@@ -318,10 +318,13 @@ public class BukkitWorld extends AbstractWorld {
 
     @Override
     public boolean equals(Object other) {
-        if (other == null) {
+        if (worldRef.get() == null) {
+            return false;
+        } else if (other == null) {
             return false;
         } else if ((other instanceof BukkitWorld)) {
-            return ((BukkitWorld) other).getWorld().equals(getWorld());
+            World otherWorld = ((BukkitWorld) other).worldRef.get();
+            return otherWorld != null && otherWorld.equals(getWorld());
         } else if (other instanceof com.sk89q.worldedit.world.World) {
             return ((com.sk89q.worldedit.world.World) other).getName().equals(getName());
         } else {

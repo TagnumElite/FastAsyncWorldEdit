@@ -189,7 +189,7 @@ public class MemoryOptimizedHistory extends FaweStreamChangeSet {
             return entCStreamZip;
         }
         entCStream = new FastByteArrayOutputStream(Settings.IMP.HISTORY.BUFFER_SIZE);
-        return entCStreamZip = new NBTOutputStream((DataOutput) getCompressedOS(entCStream));
+        return entCStreamZip = new NBTOutputStream(getCompressedOS(entCStream));
     }
 
     @Override
@@ -198,7 +198,7 @@ public class MemoryOptimizedHistory extends FaweStreamChangeSet {
             return entRStreamZip;
         }
         entRStream = new FastByteArrayOutputStream(Settings.IMP.HISTORY.BUFFER_SIZE);
-        return entRStreamZip = new NBTOutputStream((DataOutput) getCompressedOS(entRStream));
+        return entRStreamZip = new NBTOutputStream(getCompressedOS(entRStream));
     }
 
     @Override
@@ -207,7 +207,7 @@ public class MemoryOptimizedHistory extends FaweStreamChangeSet {
             return tileCStreamZip;
         }
         tileCStream = new FastByteArrayOutputStream(Settings.IMP.HISTORY.BUFFER_SIZE);
-        return tileCStreamZip = new NBTOutputStream((DataOutput) getCompressedOS(tileCStream));
+        return tileCStreamZip = new NBTOutputStream(getCompressedOS(tileCStream));
     }
 
     @Override
@@ -216,7 +216,7 @@ public class MemoryOptimizedHistory extends FaweStreamChangeSet {
             return tileRStreamZip;
         }
         tileRStream = new FastByteArrayOutputStream(Settings.IMP.HISTORY.BUFFER_SIZE);
-        return tileRStreamZip = new NBTOutputStream((DataOutput) getCompressedOS(tileRStream));
+        return tileRStreamZip = new NBTOutputStream(getCompressedOS(tileRStream));
     }
 
     @Override

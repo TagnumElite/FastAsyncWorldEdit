@@ -105,6 +105,7 @@ public class Expression {
 
     private Expression(List<Token> tokens, String... variableNames) throws ExpressionException {
         this.variableNames = variableNames;
+
         variables.put("e", new Constant(-1, Math.E));
         variables.put("pi", new Constant(-1, Math.PI));
         variables.put("true", new Constant(-1, 1));
@@ -158,7 +159,18 @@ public class Expression {
     }
 
     private double evaluateRootTimed(int timeout) throws EvaluationException {
-        Future<Double> result = evalThread.submit(this::evaluateRoot);
+        Request request = Request.request();
+        Future<Double> result = evalThread.submit(() -> {
+            Request local = Request.request();
+            local.setSession(request.getSession());
+            local.setWorld(request.getWorld());
+            local.setEditSession(request.getEditSession());
+            try {
+                return Expression.this.evaluateRoot();
+            } finally {
+                Request.reset();
+            }
+        });
         try {
             return result.get(timeout, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {

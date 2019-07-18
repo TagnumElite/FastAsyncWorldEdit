@@ -45,6 +45,21 @@ import javax.annotation.Nullable;
 public interface BukkitImplAdapter<T> extends IBukkitAdapter {
 
     /**
+     * Get the Minecraft data version for the current world data.
+     *
+     * @return the data version
+     */
+    int getDataVersion();
+
+    /**
+     * Get a data fixer, or null if not supported
+     *
+     * @return the data fixer
+     */
+    @Nullable
+    DataFixer getDataFixer();
+
+    /**
      * Get the block at the given location.
      *
      * @param location the location
@@ -104,7 +119,7 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
     default BlockMaterial getMaterial(BlockType blockType) {
         return null;
     }
-    
+
     default BlockMaterial getMaterial(BlockState blockState) {
         return null;
     }
@@ -116,7 +131,7 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
     default T fromNative(Tag foreign) {
         return null;
     }
-    
+
     /**
      * Send the given NBT data to the player.
      *

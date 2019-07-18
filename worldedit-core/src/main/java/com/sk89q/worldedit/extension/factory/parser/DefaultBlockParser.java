@@ -249,10 +249,10 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
                 } else {
                     BlockType type = BlockTypes.parse(typeString.toLowerCase(Locale.ROOT));
 
-                        if (type != null) {
-                            state = type.getDefaultState();
-                        }
-                        if (state == null) {
+                    if (type != null) {
+                        state = type.getDefaultState();
+                    }
+                    if (state == null) {
                         throw new NoMatchException("Does not match a valid block type: '" + input + "'");
                     }
                 }
@@ -296,7 +296,8 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
 
         if (nbt != null) return validate(context, state.toBaseBlock(nbt));
 
-        if (blockType == BlockTypes.SIGN || blockType == BlockTypes.WALL_SIGN) {
+        if (blockType == BlockTypes.SIGN || blockType == BlockTypes.WALL_SIGN
+                || BlockCategories.SIGNS.contains(blockType)) {
             // Allow special sign text syntax
             String[] text = new String[4];
             text[0] = blockAndExtraData.length > 1 ? blockAndExtraData[1] : "";
@@ -317,9 +318,9 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
                 if (!worldEdit.getPlatformManager().queryCapability(Capability.USER_COMMANDS).isValidMobType(mobName)) {
                     String finalMobName = mobName.toLowerCase(Locale.ROOT);
                     throw new SuggestInputParseException("Unknown mob type '" + mobName + "'", mobName, () -> Stream.of(MobType.values())
-                                                                                                                    .map(m -> m.getName().toLowerCase(Locale.ROOT))
-                                                                                                                    .filter(s -> s.startsWith(finalMobName))
-                                                                                                                    .collect(Collectors.toList()));
+                            .map(m -> m.getName().toLowerCase(Locale.ROOT))
+                            .filter(s -> s.startsWith(finalMobName))
+                            .collect(Collectors.toList()));
                 }
                 return validate(context, new MobSpawnerBlock(state, mobName));
             } else {

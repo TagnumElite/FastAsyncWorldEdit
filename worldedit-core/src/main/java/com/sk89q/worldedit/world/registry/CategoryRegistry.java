@@ -26,7 +26,7 @@ import java.util.Set;
 /**
  * A registry of categories. Minecraft internally calls these 'Tags'.
  */
-public interface CategoryRegistry<T> {
+public interface CategoryRegistry<T extends Keyed> {
 
     /**
      * Gets a set of values with a given category.

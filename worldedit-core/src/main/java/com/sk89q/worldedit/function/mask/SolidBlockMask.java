@@ -30,4 +30,26 @@ public class SolidBlockMask extends BlockMask {
         super(extent);
         add(state -> state.getMaterial().isSolid());
     }
+
+    @Override
+    public boolean test(BlockVector3 vector) {
+        Extent extent = getExtent();
+        BlockState block = extent.getBlock(vector);
+        return block.getBlockType().getMaterial().isMovementBlocker();
+    }
+
+    public static boolean[] getTypes() {
+        boolean[] types = new boolean[BlockTypes.size()];
+        for (BlockType type : BlockTypes.values) {
+            types[type.getInternalId()] = type.getMaterial().isSolid();
+        }
+        return types;
+    }
+
+    @Nullable
+    @Override
+    public Mask2D toMask2D() {
+        return null;
+    }
+
 }

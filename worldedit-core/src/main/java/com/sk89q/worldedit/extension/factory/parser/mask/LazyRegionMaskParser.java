@@ -32,17 +32,19 @@ import java.util.List;
 
 public class LazyRegionMaskParser extends SimpleInputParser<Mask> {
 
+    private final List<String> aliases = ImmutableList.of("#dregion", "#dselection", "#dsel");
+
     public LazyRegionMaskParser(WorldEdit worldEdit) {
         super(worldEdit);
     }
 
     @Override
     public List<String> getMatchedAliases() {
-        return Lists.newArrayList("#dregion", "#dselection", "#dsel");
+        return aliases;
     }
 
     @Override
-    public Mask parseFromSimpleInput(String input, ParserContext context) throws InputParseException {
+    public Mask parseFromSimpleInput(String input, ParserContext context) {
         return new RegionMask(new RequestSelection());
     }
 }

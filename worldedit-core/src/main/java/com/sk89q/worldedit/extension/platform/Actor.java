@@ -76,6 +76,13 @@ public interface Actor extends Identifiable, SessionOwner, Subject {
     void printError(String msg);
 
     /**
+     * Print a {@link Component}.
+     *
+     * @param component The component to print
+     */
+    void print(Component component);
+
+    /**
      * Returns true if the actor can destroy bedrock.
      *
      * @return true if bedrock can be broken by the actor

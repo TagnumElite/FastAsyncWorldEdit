@@ -74,6 +74,12 @@ public enum BukkitAdapter {
         return INSTANCE.adapter;
     }
 
+    private static final ParserContext TO_BLOCK_CONTEXT = new ParserContext();
+
+    static {
+        TO_BLOCK_CONTEXT.setRestricted(false);
+    }
+
     /**
      * Checks equality between a WorldEdit BlockType and a Bukkit Material
      *
@@ -113,6 +119,26 @@ public enum BukkitAdapter {
     }
 
     /**
+     * Create a WorldEdit Player from a Bukkit Player.
+     *
+     * @param player The Bukkit player
+     * @return The WorldEdit player
+     */
+    public static BukkitPlayer adapt(Player player) {
+        return getAdapter().adapt(player);
+    }
+
+    /**
+     * Create a Bukkit Player from a WorldEdit Player.
+     *
+     * @param player The WorldEdit player
+     * @return The Bukkit player
+     */
+    public static Player adapt(com.sk89q.worldedit.entity.Player player) {
+        return getAdapter().adapt(player);
+    }
+
+    /**
      * Create a WorldEdit location from a Bukkit location.
      *
      * @param location the Bukkit location
@@ -134,10 +160,24 @@ public enum BukkitAdapter {
         return getAdapter().adapt(location);
     }
 
+    /**
+     * Create a Bukkit location from a WorldEdit position with a Bukkit world.
+     *
+     * @param world the Bukkit world
+     * @param position the WorldEdit position
+     * @return a Bukkit location
+     */
     public static org.bukkit.Location adapt(org.bukkit.World world, Vector3 position) {
         return getAdapter().adapt(world, position);
     }
 
+    /**
+     * Create a Bukkit location from a WorldEdit position with a Bukkit world.
+     *
+     * @param world the Bukkit world
+     * @param position the WorldEdit position
+     * @return a Bukkit location
+     */
     public static org.bukkit.Location adapt(org.bukkit.World world, BlockVector3 position) {
         checkNotNull(world);
         checkNotNull(position);
@@ -157,19 +197,26 @@ public enum BukkitAdapter {
         return getAdapter().adapt(world, location);
     }
 
-    public static Vector3 asVector(org.bukkit.Location location) {
-        return getAdapter().asVector(location);
-    }
-
     /**
      * Create a WorldEdit Vector from a Bukkit location.
      *
      * @param location The Bukkit location
      * @return a WorldEdit vector
      */
+    public static Vector3 asVector(org.bukkit.Location location) {
+        checkNotNull(location);
+        return Vector3.at(location.getX(), location.getY(), location.getZ());
+    }
+
+    /**
+     * Create a WorldEdit BlockVector from a Bukkit location.
+     *
+     * @param location The Bukkit location
+     * @return a WorldEdit vector
+     */
     public static BlockVector3 asBlockVector(org.bukkit.Location location) {
         checkNotNull(location);
-        return getAdapter().asBlockVector(location);
+        return BlockVector3.at(location.getX(), location.getY(), location.getZ());
     }
 
     /**
@@ -328,13 +375,5 @@ public enum BukkitAdapter {
     public static ItemStack adapt(BaseItemStack item) {
         checkNotNull(item);
         return getAdapter().adapt(item);
-    }
-
-    public static BukkitPlayer adapt(Player player) {
-        return getAdapter().adapt(player);
-    }
-
-    public static Player adapt(com.sk89q.worldedit.entity.Player player) {
-        return getAdapter().adapt(player);
     }
 }

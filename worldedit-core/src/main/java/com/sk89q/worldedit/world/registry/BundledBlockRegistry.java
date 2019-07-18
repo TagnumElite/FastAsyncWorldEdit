@@ -52,4 +52,9 @@ public class BundledBlockRegistry implements BlockRegistry {
         return Collections.emptyMap(); // Oof
     }
 
+    @Override
+    public OptionalInt getInternalBlockStateId(BlockState state) {
+        return OptionalInt.empty();
+    }
+
 }

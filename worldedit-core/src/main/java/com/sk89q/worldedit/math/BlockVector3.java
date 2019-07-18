@@ -54,11 +54,13 @@ public abstract class BlockVector3 {
         return new BlockVector3Imp(x, y, z);
     }
 
-    static final Comparator<BlockVector3> YZX_ORDER = (a, b) -> ComparisonChain.start()
-            .compare(a.getY(), b.getY())
-            .compare(a.getZ(), b.getZ())
-            .compare(a.getX(), b.getX())
-            .result();
+    // thread-safe initialization idiom
+    private static final class YzxOrderComparator {
+        private static final Comparator<BlockVector3> YZX_ORDER =
+            Comparator.comparingInt(BlockVector3::getY)
+                .thenComparingInt(BlockVector3::getZ)
+                .thenComparingInt(BlockVector3::getX);
+    }
 
     /**
      * Returns a comparator that sorts vectors first by Y, then Z, then X.
@@ -67,7 +69,7 @@ public abstract class BlockVector3 {
      * Useful for sorting by chunk block storage order.
      */
     public static Comparator<BlockVector3> sortByCoordsYzx() {
-        return YZX_ORDER;
+        return YzxOrderComparator.YZX_ORDER;
     }
 
     public MutableBlockVector3 setComponents(double x, double y, double z) {
@@ -380,6 +382,50 @@ public abstract class BlockVector3 {
      */
     public BlockVector3 divide(int n) {
         return divide(n, n, n);
+    }
+
+    /**
+     * Shift all components right.
+     *
+     * @param x the value to shift x by
+     * @param y the value to shift y by
+     * @param z the value to shift z by
+     * @return a new vector
+     */
+    public BlockVector3 shr(int x, int y, int z) {
+        return at(this.x >> x, this.y >> y, this.z >> z);
+    }
+
+    /**
+     * Shift all components right by {@code n}.
+     *
+     * @param n the value to shift by
+     * @return a new vector
+     */
+    public BlockVector3 shr(int n) {
+        return shr(n, n, n);
+    }
+
+    /**
+     * Shift all components left.
+     *
+     * @param x the value to shift x by
+     * @param y the value to shift y by
+     * @param z the value to shift z by
+     * @return a new vector
+     */
+    public BlockVector3 shl(int x, int y, int z) {
+        return at(this.x << x, this.y << y, this.z << z);
+    }
+
+    /**
+     * Shift all components left by {@code n}.
+     *
+     * @param n the value to shift by
+     * @return a new vector
+     */
+    public BlockVector3 shl(int n) {
+        return shl(n, n, n);
     }
 
     /**

@@ -29,7 +29,7 @@ import java.util.Set;
  * A category of fluids. This is due to the splitting up of
  * blocks such as wool into separate ids.
  */
-public class FluidCategory extends Category<FluidType> {
+public class FluidCategory extends Category<FluidType> implements Keyed {
 
     public static final NamespacedRegistry<FluidCategory> REGISTRY = new NamespacedRegistry<>("fluid tag");
 

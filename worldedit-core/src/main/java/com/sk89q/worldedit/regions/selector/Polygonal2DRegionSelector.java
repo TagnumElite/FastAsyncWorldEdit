@@ -282,4 +282,5 @@ public class Polygonal2DRegionSelector implements RegionSelector, CUIRegion {
     public String getLegacyTypeID() {
         return "polygon2d";
     }
+
 }

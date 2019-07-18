@@ -47,16 +47,7 @@ public class BrushListener implements Listener {
             }
             ScrollTool scrollable = (ScrollTool) tool;
             if (scrollable.increment(player, ri)) {
-                if (Settings.IMP.EXPERIMENTAL.PERSISTENT_BRUSHES) {
-                    bukkitPlayer.getInventory().setHeldItemSlot(oldSlot);
-                } else {
-                    final PlayerInventory inv = bukkitPlayer.getInventory();
-                    final ItemStack item = inv.getItem(slot);
-                    final ItemStack newItem = inv.getItem(oldSlot);
-                    inv.setItem(slot, newItem);
-                    inv.setItem(oldSlot, item);
-                    bukkitPlayer.updateInventory();
-                }
+                bukkitPlayer.getInventory().setHeldItemSlot(oldSlot);
             }
         }
     }

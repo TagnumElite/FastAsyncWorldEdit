@@ -31,13 +31,15 @@ import java.util.List;
 
 public class SolidMaskParser extends SimpleInputParser<Mask> {
 
+    private final List<String> aliases = ImmutableList.of("#solid");
+
     public SolidMaskParser(WorldEdit worldEdit) {
         super(worldEdit);
     }
 
     @Override
     public List<String> getMatchedAliases() {
-        return Lists.newArrayList("#solid");
+        return aliases;
     }
 
     @Override

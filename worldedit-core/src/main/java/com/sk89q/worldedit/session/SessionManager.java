@@ -63,6 +63,8 @@ public class SessionManager {
     private static final int FLUSH_PERIOD = 1000 * 60;
     private static final ListeningExecutorService executorService = MoreExecutors.listeningDecorator(EvenMoreExecutors.newBoundedCachedThreadPool(0, 1, 5));
     private static final Logger log = LoggerFactory.getLogger(SessionManager.class);
+    private static boolean warnedInvalidTool;
+
     private final Timer timer = new Timer();
     private final WorldEdit worldEdit;
     private final Map<UUID, SessionHolder> sessions = new HashMap<>();
@@ -187,6 +189,19 @@ public class SessionManager {
         return false;
     }
 
+    private void setDefaultWand(String sessionItem, String configItem, LocalSession session, Tool wand) throws InvalidToolBindException {
+        ItemType wandItem = null;
+        if (sessionItem != null) {
+            wandItem = ItemTypes.get(sessionItem);
+        }
+        if (wandItem == null) {
+            wandItem = ItemTypes.get(configItem);
+        }
+        if (wandItem != null) {
+            session.setTool(wandItem, wand);
+        }
+    }
+
     /**
      * Save a map of sessions to disk.
      *
@@ -242,7 +257,7 @@ public class SessionManager {
      * @return the key object
      */
     protected UUID getKey(SessionKey key) {
-            return key.getUniqueId();
+        return key.getUniqueId();
     }
 
     /**

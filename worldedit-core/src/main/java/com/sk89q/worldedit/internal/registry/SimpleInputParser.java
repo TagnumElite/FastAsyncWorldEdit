@@ -65,7 +65,16 @@ public abstract class SimpleInputParser<E> extends InputParser<E> {
     }
 
     @Override
-    public List<String> getSuggestions() {
-        return Lists.newArrayList(getPrimaryMatcher());
+    public Stream<String> getSuggestions(String input) {
+        if (input.isEmpty()) {
+            return Stream.of(getPrimaryMatcher());
+        }
+        final String prefix = input.toLowerCase(Locale.ROOT);
+        for (String alias : getMatchedAliases()) {
+            if (alias.startsWith(prefix)) {
+                return Stream.of(alias);
+            }
+        }
+        return Stream.empty();
     }
 }

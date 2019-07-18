@@ -75,7 +75,7 @@ public class Message {
     }
 
     public Message command(String command) {
-        Fawe.get().getChatManager().command(this, (WorldEdit.getInstance().getConfiguration().noDoubleSlash ? "" : "/") + command);
+        Fawe.get().getChatManager().command(this, ("/") + command);
         return this;
     }
 

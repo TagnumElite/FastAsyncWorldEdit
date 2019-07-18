@@ -105,6 +105,7 @@ public final class WorldEdit {
     private final PlatformManager platformManager = new PlatformManager(this);
     private final EditSessionFactory editSessionFactory = new EditSessionFactory.EditSessionFactoryImpl(eventBus);
     private final SessionManager sessions = new SessionManager(this);
+    private final ListeningExecutorService executorService = MoreExecutors.listeningDecorator(EvenMoreExecutors.newBoundedCachedThreadPool(0, 1, 20));
     private final Supervisor supervisor = new SimpleSupervisor();
 
     private final BlockFactory blockFactory = new BlockFactory(this);
@@ -155,12 +156,21 @@ public final class WorldEdit {
     }
 
     /**
-     * Get the supervisor.
+     * Get the supervisor. Internal, not for API use.
      *
      * @return the supervisor
      */
     public Supervisor getSupervisor() {
         return supervisor;
+    }
+
+    /**
+     * Get the executor service. Internal, not for API use.
+     *
+     * @return the executor service
+     */
+    public ListeningExecutorService getExecutorService() {
+        return executorService;
     }
 
     /**
@@ -307,6 +317,17 @@ public final class WorldEdit {
             if (exts.size() != 1) {
                 exts = exts.subList(0, 1);
             }
+        } else {
+            int dot = filename.lastIndexOf('.');
+            if (dot < 0 || dot == filename.length() - 1) {
+                String currentExt = filename.substring(dot + 1);
+                if (exts.contains(currentExt) && checkFilename(filename)) {
+                    File f = new File(dir, filename);
+                    if (f.exists()) {
+                        return f;
+                    }
+                }
+            }
         }
         File result = null;
         for (Iterator<String> iter = exts.iterator(); iter.hasNext() && (result == null || (!isSave && !result.exists()));) {
@@ -321,7 +342,7 @@ public final class WorldEdit {
     private File getSafeFileWithExtension(File dir, String filename, String extension) {
         if (extension != null) {
             int dot = filename.lastIndexOf('.');
-            if (dot < 0 || !filename.substring(dot).equalsIgnoreCase(extension)) {
+            if (dot < 0 || dot == filename.length() - 1 || !filename.substring(dot + 1).equalsIgnoreCase(extension)) {
                 filename += "." + extension;
             }
         }
@@ -396,16 +417,15 @@ public final class WorldEdit {
     }
 
     /**
-     * Get the direction vector for a player's direction. May return
-     * null if a direction could not be found.
+     * Get the direction vector for a player's direction.
      *
      * @param player the player
      * @param dirStr the direction string
      * @return a direction vector
-     * @throws UnknownDirectionException thrown if the direction is not known
+     * @throws UnknownDirectionException thrown if the direction is not known, or a relative direction is used with null player
      */
-    public BlockVector3 getDirection(Player player, String dirStr) throws UnknownDirectionException {
-        dirStr = dirStr.toLowerCase();
+    public BlockVector3 getDirection(@Nullable Player player, String dirStr) throws UnknownDirectionException {
+        dirStr = dirStr.toLowerCase(Locale.ROOT);
 
         final Direction dir = getPlayerDirection(player, dirStr);
 
@@ -417,16 +437,15 @@ public final class WorldEdit {
     }
 
     /**
-     * Get the direction vector for a player's direction. May return
-     * null if a direction could not be found.
+     * Get the direction vector for a player's direction.
      *
      * @param player the player
      * @param dirStr the direction string
      * @return a direction vector
-     * @throws UnknownDirectionException thrown if the direction is not known
+     * @throws UnknownDirectionException thrown if the direction is not known, or a relative direction is used with null player
      */
-    public BlockVector3 getDiagonalDirection(Player player, String dirStr) throws UnknownDirectionException {
-        dirStr = dirStr.toLowerCase();
+    public BlockVector3 getDiagonalDirection(@Nullable Player player, String dirStr) throws UnknownDirectionException {
+        dirStr = dirStr.toLowerCase(Locale.ROOT);
 
         final Direction dir = getPlayerDirection(player, dirStr);
 
@@ -438,15 +457,14 @@ public final class WorldEdit {
     }
 
     /**
-     * Get the direction vector for a player's direction. May return
-     * null if a direction could not be found.
+     * Get the direction vector for a player's direction.
      *
      * @param player the player
      * @param dirStr the direction string
      * @return a direction enum value
-     * @throws UnknownDirectionException thrown if the direction is not known
+     * @throws UnknownDirectionException thrown if the direction is not known, or a relative direction is used with null player
      */
-    private Direction getPlayerDirection(Player player, String dirStr) throws UnknownDirectionException {
+    private Direction getPlayerDirection(@Nullable Player player, String dirStr) throws UnknownDirectionException {
         final Direction dir;
 
         switch (dirStr.charAt(0)) {
@@ -490,25 +508,32 @@ public final class WorldEdit {
 
         case 'm': // me
         case 'f': // forward
-            dir = player.getCardinalDirection(0);
+            dir = getDirectionRelative(player, 0);
             break;
 
         case 'b': // back
-            dir = player.getCardinalDirection(180);
+            dir = getDirectionRelative(player, 180);
             break;
 
         case 'l': // left
-            dir = player.getCardinalDirection(-90);
+            dir = getDirectionRelative(player, -90);
             break;
 
         case 'r': // right
-            dir = player.getCardinalDirection(90);
+            dir = getDirectionRelative(player, 90);
             break;
 
         default:
             throw new UnknownDirectionException(dirStr);
         }
         return dir;
+    }
+
+    private Direction getDirectionRelative(Player player, int yawOffset) throws UnknownDirectionException {
+        if (player != null) {
+            return player.getCardinalDirection(yawOffset);
+        }
+        throw new UnknownDirectionException("Only a player can use relative directions");
     }
 
     /**
@@ -650,9 +675,9 @@ public final class WorldEdit {
 
         try {
             engine = new RhinoCraftScriptEngine();
-        } catch (NoClassDefFoundError e) {
+        } catch (NoClassDefFoundError ignored) {
             player.printError("Failed to find an installed script engine.");
-            player.printError("Please see http://wiki.sk89q.com/wiki/WorldEdit/Installation");
+            player.printError("Please see https://worldedit.readthedocs.io/en/latest/usage/other/craftscripts/");
             return;
         }
 

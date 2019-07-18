@@ -31,7 +31,7 @@ import java.util.Set;
  * A category of items. This is due to the splitting up of
  * items such as wool into separate ids.
  */
-public class ItemCategory extends Category<ItemType> {
+public class ItemCategory extends Category<ItemType> implements Keyed {
 
     public static final NamespacedRegistry<ItemCategory> REGISTRY = new NamespacedRegistry<>("item tag");
 

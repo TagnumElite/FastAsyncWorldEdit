@@ -42,6 +42,7 @@ public class SurvivalModeExtent extends AbstractDelegateExtent {
 
     private final World world;
     private boolean toolUse = false;
+    private boolean stripNbt = false;
 
     /**
      * Create a new instance.
@@ -80,13 +81,26 @@ public class SurvivalModeExtent extends AbstractDelegateExtent {
         this.toolUse = toolUse;
     }
 
+    public boolean hasStripNbt() {
+        return stripNbt;
+    }
+
+    public void setStripNbt(boolean stripNbt) {
+        this.stripNbt = stripNbt;
+    }
+
     @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 location, B block) throws WorldEditException {
         if (toolUse && block.getBlockType().getMaterial().isAir()) {
             world.simulateBlockMine(location);
             return true;
         } else {
-            return super.setBlock(location, block);
+            // Can't be an inlined check due to inconsistent generic return type
+            if (stripNbt) {
+                return super.setBlock(location, block.toBaseBlock(null));
+            } else {
+                return super.setBlock(location, block);
+            }
         }
     }
 
@@ -96,7 +110,12 @@ public class SurvivalModeExtent extends AbstractDelegateExtent {
             world.simulateBlockMine(BlockVector3.at(x, y, z));
             return true;
         } else {
-            return super.setBlock(x, y, z, block);
+            // Can't be an inlined check due to inconsistent generic return type
+            if (stripNbt) {
+                return super.setBlock(x, y, z, block.toBaseBlock(null));
+            } else {
+                return super.setBlock(x, y, z, block);
+            }
         }
     }
 }

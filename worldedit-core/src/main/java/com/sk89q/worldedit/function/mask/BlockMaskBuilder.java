@@ -73,12 +73,15 @@ public class BlockMaskBuilder {
                 result = bitSets[type.getInternalId()] != null;
                 remove(type);
             }
-        } else if (value.length() == 0) {
-
-        } else if ((operator == EQUAL || operator == EQUAL_OR_NULL) && !StringMan.isAlphanumericUnd(value)) {
-            result = filterRegex(type, key, value.toString());
         } else {
-            result = filterOperator(type, key, operator, value);
+            if (value.length() == 0) {
+                return result;
+            }
+            if ((operator == EQUAL || operator == EQUAL_OR_NULL) && !StringMan.isAlphanumericUnd(value)) {
+                result = filterRegex(type, key, value.toString());
+            } else {
+                result = filterOperator(type, key, operator, value);
+            }
         }
         return result;
     }
@@ -231,7 +234,7 @@ public class BlockMaskBuilder {
         throw new SuggestInputParseException(input + " does not have: " + property, input, () -> {
             Set<PropertyKey> keys = new HashSet<>();
             finalTypes.forEach(t -> t.getProperties().stream().forEach(p -> keys.add(p.getKey())));
-            return keys.stream().map(p -> p.getId())
+            return keys.stream().map(PropertyKey::getId)
                     .filter(p -> StringMan.blockStateMatches(property, p))
                     .sorted(StringMan.blockStateComparator(property))
                     .collect(Collectors.toList());
@@ -246,10 +249,7 @@ public class BlockMaskBuilder {
     private boolean optimizedStates = true;
 
     public boolean isEmpty() {
-        for (long[] bitSet : bitSets) {
-            if (bitSet != null) return false;
-        }
-        return true;
+        return Arrays.stream(bitSets).noneMatch(Objects::nonNull);
     }
 
     public BlockMaskBuilder() {

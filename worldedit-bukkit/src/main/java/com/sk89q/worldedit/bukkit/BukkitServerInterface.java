@@ -65,6 +65,22 @@ public class BukkitServerInterface implements MultiUserPlatform {
     }
 
     @Override
+    public int getDataVersion() {
+        if (plugin.getBukkitImplAdapter() != null) {
+            return plugin.getBukkitImplAdapter().getDataVersion();
+        }
+        return -1;
+    }
+
+    @Override
+    public DataFixer getDataFixer() {
+        if (plugin.getBukkitImplAdapter() != null) {
+            return plugin.getBukkitImplAdapter().getDataFixer();
+        }
+        return null;
+    }
+
+    @Override
     public boolean isValidMobType(String type) {
         final EntityType entityType = EntityType.fromName(type);
         return entityType != null && entityType.isAlive();
@@ -115,20 +131,25 @@ public class BukkitServerInterface implements MultiUserPlatform {
     }
 
     @Override
-    public void registerCommands(Dispatcher dispatcher) {
-        List<CommandInfo> toRegister = new ArrayList<>();
+    public void registerCommands(CommandManager dispatcher) {
         BukkitCommandInspector inspector = new BukkitCommandInspector(plugin, dispatcher);
 
-        for (CommandMapping command : dispatcher.getCommands()) {
-            Description description = command.getDescription();
-            List<String> permissions = description.getPermissions();
-            String[] permissionsArray = new String[permissions.size()];
-            permissions.toArray(permissionsArray);
+        dynamicCommands.register(dispatcher.getAllCommands()
+            .map(command -> {
+                String[] permissionsArray = command.getCondition()
+                    .as(PermissionCondition.class)
+                    .map(PermissionCondition::getPermissions)
+                    .map(s -> s.toArray(new String[0]))
+                    .orElseGet(() -> new String[0]);
 
-            toRegister.add(new CommandInfo(description.getUsage(), description.getDescription(), command.getAllAliases(), inspector, permissionsArray));
-        }
-
-        dynamicCommands.register(toRegister);
+                String[] aliases = Stream.concat(
+                    Stream.of(command.getName()),
+                    command.getAliases().stream()
+                ).toArray(String[]::new);
+                return new CommandInfo(reduceToText(command.getUsage()),
+                    reduceToText(command.getDescription()), aliases,
+                    inspector, permissionsArray);
+            }).collect(Collectors.toList()));
     }
 
     @Override

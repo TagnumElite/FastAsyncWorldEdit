@@ -224,8 +224,7 @@ public class WritableMCAChunk extends FaweChunk<Void> {
             buffer = new byte[8192];
         }
         FastByteArrayOutputStream buffered = new FastByteArrayOutputStream(buffer);
-        DataOutputStream dataOut = new DataOutputStream(buffered);
-        try (NBTOutputStream nbtOut = new NBTOutputStream((DataOutput) dataOut)) {
+        try (NBTOutputStream nbtOut = new NBTOutputStream(buffered)) {
             write(nbtOut);
         }
         return buffered.toByteArray();

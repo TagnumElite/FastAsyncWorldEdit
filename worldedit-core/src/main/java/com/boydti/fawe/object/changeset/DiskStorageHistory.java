@@ -291,7 +291,7 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
         }
         enttFile.getParentFile().mkdirs();
         enttFile.createNewFile();
-        osENTCT = new NBTOutputStream((DataOutput) getCompressedOS(new FileOutputStream(enttFile)));
+        osENTCT = new NBTOutputStream(getCompressedOS(new FileOutputStream(enttFile)));
         return osENTCT;
     }
 
@@ -302,7 +302,7 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
         }
         entfFile.getParentFile().mkdirs();
         entfFile.createNewFile();
-        osENTCF = new NBTOutputStream((DataOutput) getCompressedOS(new FileOutputStream(entfFile)));
+        osENTCF = new NBTOutputStream(getCompressedOS(new FileOutputStream(entfFile)));
         return osENTCF;
     }
 
@@ -313,7 +313,7 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
         }
         nbttFile.getParentFile().mkdirs();
         nbttFile.createNewFile();
-        osNBTT = new NBTOutputStream((DataOutput) getCompressedOS(new FileOutputStream(nbttFile)));
+        osNBTT = new NBTOutputStream(getCompressedOS(new FileOutputStream(nbttFile)));
         return osNBTT;
     }
 
@@ -324,7 +324,7 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
         }
         nbtfFile.getParentFile().mkdirs();
         nbtfFile.createNewFile();
-        osNBTF = new NBTOutputStream((DataOutput) getCompressedOS(new FileOutputStream(nbtfFile)));
+        osNBTF = new NBTOutputStream(getCompressedOS(new FileOutputStream(nbtfFile)));
         return osNBTF;
     }
 
@@ -343,8 +343,7 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
         if (!bioFile.exists()) {
             return null;
         }
-        FaweInputStream is = MainUtil.getCompressedIS(new FileInputStream(bioFile));
-        return is;
+        return MainUtil.getCompressedIS(new FileInputStream(bioFile));
     }
 
     @Override
@@ -391,8 +390,8 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
                 // skip mode
                 gis.skipFully(1);
                 // origin
-                ox = ((gis.read() << 24) + (gis.read() << 16) + (gis.read() << 8) + (gis.read() << 0));
-                oz = ((gis.read() << 24) + (gis.read() << 16) + (gis.read() << 8) + (gis.read() << 0));
+                ox = ((gis.read() << 24) + (gis.read() << 16) + (gis.read() << 8) + gis.read());
+                oz = ((gis.read() << 24) + (gis.read() << 16) + (gis.read() << 8) + gis.read());
                 setOrigin(ox, oz);
                 DiskStorageSummary summary = new DiskStorageSummary(ox, oz);
                 if (!requiredRegion.isIn(ox, oz)) {
@@ -432,8 +431,8 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
                 // skip mode
                 gis.skipFully(1);
                 // origin
-                ox = ((gis.read() << 24) + (gis.read() << 16) + (gis.read() << 8) + (gis.read() << 0));
-                oz = ((gis.read() << 24) + (gis.read() << 16) + (gis.read() << 8) + (gis.read() << 0));
+                ox = ((gis.read() << 24) + (gis.read() << 16) + (gis.read() << 8) + gis.read());
+                oz = ((gis.read() << 24) + (gis.read() << 16) + (gis.read() << 8) + gis.read());
                 setOrigin(ox, oz);
                 fis.close();
                 gis.close();
@@ -446,8 +445,6 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
 
     public static class DiskStorageSummary {
 
-        private final int z;
-        private final int x;
         public int[] blocks;
 
         public int minX;
@@ -458,8 +455,6 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
 
         public DiskStorageSummary(int x, int z) {
             blocks = new int[BlockTypes.states.length];
-            this.x = x;
-            this.z = z;
             minX = x;
             maxX = x;
             minZ = z;
@@ -485,7 +480,7 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
             for (int i = 0; i < blocks.length; i++) {
                 if (blocks[i] != 0) {
                     BlockState state = BlockTypes.states[i];
-                    map.put(state, (Integer) blocks[i]);
+                    map.put(state, blocks[i]);
                 }
             }
             return map;
@@ -498,8 +493,8 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
             for (Map.Entry<BlockState, Integer> entry : map.entrySet()) {
                 BlockState id = entry.getKey();
                 int changes = entry.getValue();
-                double percent = ((changes * 1000l) / count) / 10d;
-                newMap.put(id, (Double) percent);
+                double percent = (changes * 1000L / count) / 10d;
+                newMap.put(id, percent);
             }
             return newMap;
         }

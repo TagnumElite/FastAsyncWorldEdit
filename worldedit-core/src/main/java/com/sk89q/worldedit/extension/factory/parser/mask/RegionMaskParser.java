@@ -32,13 +32,15 @@ import java.util.List;
 
 public class RegionMaskParser extends SimpleInputParser<Mask> {
 
+    private final List<String> aliases = ImmutableList.of("#region", "#selection", "#sel");
+
     public RegionMaskParser(WorldEdit worldEdit) {
         super(worldEdit);
     }
 
     @Override
     public List<String> getMatchedAliases() {
-        return Lists.newArrayList("#region", "#selection", "#sel");
+        return aliases;
     }
 
     @Override

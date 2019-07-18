@@ -22,7 +22,7 @@ public class DesaturatePattern extends AbstractPattern {
 
     @Override
     public BaseBlock apply(BlockVector3 position) {
-        BlockType block = extent.getBlockType(position);
+        BlockType block = extent.getBlock(position).getBlockType();
         TextureUtil util = holder.getTextureUtil();
         int color = getColor(util.getColor(block));
         return util.getNearestBlock(color).getDefaultState().toBaseBlock();

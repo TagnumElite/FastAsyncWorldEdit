@@ -252,12 +252,12 @@ public class HeightMap {
      * @return number of blocks affected
      * @throws MaxChangedBlocksException
      */
+
     public int apply(int[] data) throws MaxChangedBlocksException {
         checkNotNull(data);
 
         BlockVector3 minY = region.getMinimumPoint();
         int originX = minY.getBlockX();
-        int originY = minY.getBlockY();
         int originZ = minY.getBlockZ();
 
         int maxY = region.getMaximumPoint().getBlockY();

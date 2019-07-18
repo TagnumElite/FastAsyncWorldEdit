@@ -148,7 +148,7 @@ public class FaweAPI {
      * @param aliases The aliases to give the command (or none)
      */
     public static void registerCommands(Object clazz, String... aliases) {
-        CommandManager.getInstance().registerCommands(clazz, aliases);
+        PlatformCommandManager.getInstance().registerCommands(clazz, aliases);
     }
 
     /**

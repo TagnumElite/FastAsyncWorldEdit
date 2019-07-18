@@ -39,7 +39,7 @@ public class ResettableExtent extends AbstractDelegateExtent implements Serializ
         return this;
     }
 
-    private void writeObject(java.io.ObjectOutputStream stream) throws IOException {
+    private void writeObject(ObjectOutputStream stream) throws IOException {
         stream.defaultWriteObject();
         Extent extent = getExtent();
         boolean next = extent instanceof ResettableExtent;

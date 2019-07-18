@@ -39,4 +39,8 @@ public abstract class AbstractPlatform implements Platform {
         return Collections.emptyList();
     }
 
+    @Override
+    public DataFixer getDataFixer() {
+        return null;
+    }
 }

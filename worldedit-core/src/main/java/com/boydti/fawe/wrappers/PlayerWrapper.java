@@ -121,6 +121,10 @@ public class PlayerWrapper extends AbstractPlayerActor {
         parent.printError(msg);
     }
 
+    @Override public void print(Component component) {
+        parent.print(component);
+    }
+
     @Override
     public String[] getGroups() {
         return parent.getGroups();
@@ -129,6 +133,14 @@ public class PlayerWrapper extends AbstractPlayerActor {
     @Override
     public boolean hasPermission(String perm) {
         return parent.hasPermission(perm);
+    }
+
+    @Override public boolean togglePermission(String permission) {
+        return parent.togglePermission(permission);
+    }
+
+    @Override public void setPermission(String permission, boolean value) {
+        parent.setPermission(permission, value);
     }
 
     @Override
@@ -336,50 +348,47 @@ public class PlayerWrapper extends AbstractPlayerActor {
 
     @Override
     public boolean passThroughForwardWall(final int range) {
-        return TaskManager.IMP.sync(new Supplier<Boolean>() {
-            @Override
-            public Boolean get() {
-                int searchDist = 0;
-                TargetBlock hitBlox = new TargetBlock(PlayerWrapper.this, range, 0.2);
-                Extent world = getLocation().getExtent();
-                Location block;
-                boolean firstBlock = true;
-                int freeToFind = 2;
-                boolean inFree = false;
+        return TaskManager.IMP.sync(() -> {
+            int searchDist = 0;
+            TargetBlock hitBlox = new TargetBlock(PlayerWrapper.this, range, 0.2);
+            Extent world = getLocation().getExtent();
+            Location block;
+            boolean firstBlock = true;
+            int freeToFind = 2;
+            boolean inFree = false;
 
-                while ((block = hitBlox.getNextBlock()) != null) {
-                    boolean free = !world.getBlock(BlockVector3.at(block.getBlockX(), block.getBlockY(), block.getBlockZ())).getBlockType().getMaterial().isMovementBlocker();
+            while ((block = hitBlox.getNextBlock()) != null) {
+                boolean free = !world.getBlock(BlockVector3.at(block.getBlockX(), block.getBlockY(), block.getBlockZ())).getBlockType().getMaterial().isMovementBlocker();
 
-                    if (firstBlock) {
-                        firstBlock = false;
+                if (firstBlock) {
+                    firstBlock = false;
 
-                        if (!free) {
-                            --freeToFind;
-                            continue;
-                        }
+                    if (!free) {
+                        --freeToFind;
+                        continue;
                     }
-
-                    ++searchDist;
-                    if (searchDist > 20) {
-                        return false;
-                    }
-
-                    if (inFree != free) {
-                        if (free) {
-                            --freeToFind;
-                        }
-                    }
-
-                    if (freeToFind == 0) {
-                        setOnGround(block);
-                        return true;
-                    }
-
-                    inFree = free;
                 }
 
-                return false;
+                ++searchDist;
+                if (searchDist > 20) {
+                    return false;
+                }
+
+                if (inFree != free) {
+                    if (free) {
+                        --freeToFind;
+                    }
+                }
+
+                if (freeToFind == 0) {
+                    setOnGround(block);
+                    return true;
+                }
+
+                inFree = free;
             }
+
+            return false;
         });
     }
 

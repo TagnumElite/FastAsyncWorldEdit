@@ -187,7 +187,7 @@ public class GardenPatchGenerator implements RegionFunction {
      * @return a pumpkin pattern
      */
     public static Pattern getPumpkinPattern() {
-        return (BlockTypes.PUMPKIN.getDefaultState());
+        return BlockTypes.PUMPKIN.getDefaultState();
     }
 
     /**
@@ -208,6 +208,6 @@ public class GardenPatchGenerator implements RegionFunction {
      * @return a melon pattern
      */
     public static Pattern getMelonPattern() {
-        return (BlockTypes.MELON.getDefaultState());
+        return BlockTypes.MELON.getDefaultState();
     }
 }

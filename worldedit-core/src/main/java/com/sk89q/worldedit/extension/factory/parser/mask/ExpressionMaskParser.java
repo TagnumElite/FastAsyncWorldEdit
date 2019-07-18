@@ -42,6 +42,14 @@ public class ExpressionMaskParser extends InputParser<Mask> {
     }
 
     @Override
+    public Stream<String> getSuggestions(String input) {
+        if (input.isEmpty()) {
+            return Stream.of("=");
+        }
+        return Stream.empty();
+    }
+
+    @Override
     public Mask parseFromInput(String input, ParserContext context) throws InputParseException {
         if (!input.startsWith("=")) {
             return null;
@@ -52,10 +60,10 @@ public class ExpressionMaskParser extends InputParser<Mask> {
             WorldEditExpressionEnvironment env = new WorldEditExpressionEnvironment(
                     new RequestExtent(), Vector3.ONE, Vector3.ZERO);
             exp.setEnvironment(env);
-            if (context.getActor() instanceof SessionOwner) {
-                SessionOwner owner = (SessionOwner) context.getActor();
+            if (context.getActor() != null) {
+                SessionOwner owner = context.getActor();
                 IntSupplier timeout = () -> WorldEdit.getInstance().getSessionManager().get(owner).getTimeout();
-                // TODO timeout
+                return new ExpressionMask(exp, timeout);
             }
             return new ExpressionMask(exp);
         } catch (ExpressionException e) {

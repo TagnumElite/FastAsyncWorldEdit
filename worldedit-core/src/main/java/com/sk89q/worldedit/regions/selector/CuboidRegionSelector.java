@@ -129,7 +129,7 @@ public class CuboidRegionSelector implements RegionSelector, CUIRegion {
     public boolean selectPrimary(BlockVector3 position, SelectorLimits limits) {
         checkNotNull(position);
 
-        if (position1 != null && position1.equals(position)) {
+        if (position.equals(position1)) {
             return false;
         }
 
@@ -142,7 +142,7 @@ public class CuboidRegionSelector implements RegionSelector, CUIRegion {
     public boolean selectSecondary(BlockVector3 position, SelectorLimits limits) {
         checkNotNull(position);
 
-        if (position2 != null && position2.equals(position)) {
+        if (position.equals(position2)) {
             return false;
         }
 
@@ -157,15 +157,12 @@ public class CuboidRegionSelector implements RegionSelector, CUIRegion {
         checkNotNull(session);
         checkNotNull(pos);
 
-        Message msg;
+        //TODO Re-add better translation
         if (position1 != null && position2 != null) {
-            msg = BBC.SELECTOR_POS.m(1, position1, region.getArea());
+            player.print("First position set to " + position1 + " (" + region.getArea() + ").");
         } else {
-            msg = BBC.SELECTOR_POS.m(1, position1, "");
+            player.print("First position set to " + position1 + ".");
         }
-        String prefix = WorldEdit.getInstance().getConfiguration().noDoubleSlash ? "" : "/";
-        String cmd = prefix + Commands.getAlias(SelectionCommands.class, "/pos1") + " " + pos.getBlockX() + "," + pos.getBlockY() + "," + pos.getBlockZ();
-        msg.suggestTip(cmd).send(player);
 
         session.dispatchCUIEvent(player, new SelectionPointEvent(0, pos, getArea()));
     }
@@ -176,15 +173,12 @@ public class CuboidRegionSelector implements RegionSelector, CUIRegion {
         checkNotNull(session);
         checkNotNull(pos);
 
-        Message msg;
+        //TODO Re-add better translation
         if (position1 != null && position2 != null) {
-            msg = BBC.SELECTOR_POS.m(2, position2, region.getArea());
+            player.print("Second position set to " + position2 + " (" + region.getArea() + ").");
         } else {
-            msg = BBC.SELECTOR_POS.m(2, position2, "");
+            player.print("Second position set to " + position2 + ".");
         }
-        String prefix = WorldEdit.getInstance().getConfiguration().noDoubleSlash ? "" : "/";
-        String cmd = prefix + Commands.getAlias(SelectionCommands.class, "/pos2") + " " + pos.getBlockX() + "," + pos.getBlockY() + "," + pos.getBlockZ();
-        msg.suggestTip(cmd).send(player);
 
         session.dispatchCUIEvent(player, new SelectionPointEvent(1, pos, getArea()));
     }
@@ -193,6 +187,8 @@ public class CuboidRegionSelector implements RegionSelector, CUIRegion {
     public void explainRegionAdjust(Actor player, LocalSession session) {
         checkNotNull(player);
         checkNotNull(session);
+
+        session.dispatchCUIEvent(player, new SelectionShapeEvent(getTypeID()));
 
         if (position1 != null) {
             session.dispatchCUIEvent(player, new SelectionPointEvent(0, position1, getArea()));
@@ -313,5 +309,4 @@ public class CuboidRegionSelector implements RegionSelector, CUIRegion {
     public List<BlockVector3> getVerticies() {
         return Arrays.asList(position1, position2);
     }
-
 }

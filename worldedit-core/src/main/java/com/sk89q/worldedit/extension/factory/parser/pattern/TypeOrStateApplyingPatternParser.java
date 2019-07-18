@@ -45,6 +45,30 @@ public class TypeOrStateApplyingPatternParser extends InputParser<Pattern> {
     }
 
     @Override
+    public Stream<String> getSuggestions(String input) {
+        if (input.isEmpty()) {
+            return Stream.of("^");
+        }
+        if (!input.startsWith("^")) {
+            return Stream.empty();
+        }
+        input = input.substring(1);
+
+        String[] parts = input.split("\\[", 2);
+        String type = parts[0];
+
+        if (parts.length == 1) {
+            return worldEdit.getBlockFactory().getSuggestions(input).stream().map(s -> "^" + s);
+        } else {
+            if (type.isEmpty()) {
+                return Stream.empty(); // without knowing a type, we can't really suggest states
+            } else {
+                return SuggestionHelper.getBlockPropertySuggestions(type, parts[1]).map(s -> "^" + s);
+            }
+        }
+    }
+
+    @Override
     public Pattern parseFromInput(String input, ParserContext context) throws InputParseException {
         if (!input.startsWith("^")) {
             return null;
@@ -60,10 +84,21 @@ public class TypeOrStateApplyingPatternParser extends InputParser<Pattern> {
                     worldEdit.getBlockFactory().parseFromInput(type, context).getBlockType().getDefaultState());
         } else {
             // states given
-            if (!parts[1].endsWith("]")) throw new InputParseException("Invalid state format.");
-            Map<String, String> statesToSet = Splitter.on(',')
-                    .omitEmptyStrings().trimResults().withKeyValueSeparator('=')
-                    .split(parts[1].substring(0, parts[1].length() - 1));
+            if (!parts[1].endsWith("]")) throw new InputParseException("State is missing trailing ']'");
+            final String[] states = parts[1].substring(0, parts[1].length() - 1).split(",");
+            Map<String, String> statesToSet = new HashMap<>();
+            for (String state : states) {
+                if (state.isEmpty()) throw new InputParseException("Empty part in state");
+                String[] propVal = state.split("=", 2);
+                if (propVal.length != 2) throw new InputParseException("Missing '=' separator");
+                final String prop = propVal[0];
+                if (prop.isEmpty()) throw new InputParseException("Empty property in state");
+                final String value = propVal[1];
+                if (value.isEmpty()) throw new InputParseException("Empty value in state");
+                if (statesToSet.put(prop, value) != null) {
+                    throw new InputParseException("Duplicate properties in state");
+                }
+            }
             if (type.isEmpty()) {
                 return new StateApplyingPattern(extent, statesToSet);
             } else {

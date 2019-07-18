@@ -69,7 +69,7 @@ public class BlockType implements FawePattern, Keyed {
      */
     @Override
     public String getId() {
-    	return this.id;
+        return this.id;
     }
 
     public String getNamespace() {
@@ -97,22 +97,6 @@ public class BlockType implements FawePattern, Keyed {
         }
     }
 
-    @Deprecated
-    public BlockState withPropertyId(int propertyId) {
-        if (settings.stateOrdinals == null) return settings.defaultState;
-        return BlockTypes.states[settings.stateOrdinals[propertyId]];
-    }
-    
-    @Deprecated
-    public BlockState withStateId(int internalStateId) { //
-        return this.withPropertyId(internalStateId >> BlockTypes.BIT_OFFSET);
-    }
-
-    /**
-     * Properties string in the form property1=foo,prop2=bar
-     * @param properties
-     * @return
-     */
     public BlockState withProperties(String properties) { //
         int id = getInternalId();
         for (String keyPair : properties.split(",")) {
@@ -125,12 +109,22 @@ public class BlockType implements FawePattern, Keyed {
         return withStateId(id);
     }
 
+    @Deprecated
+    public BlockState withPropertyId(int propertyId) {
+        if (settings.stateOrdinals == null) return settings.defaultState;
+        return BlockTypes.states[settings.stateOrdinals[propertyId]];
+    }
+
+    @Deprecated
+    public BlockState withStateId(int internalStateId) { //
+        return this.withPropertyId(internalStateId >> BlockTypes.BIT_OFFSET);
+    }
+
     /**
-     * Gets the properties of this BlockType in a key->property mapping.
+     * Gets the properties of this BlockType in a {@code key->property} mapping.
      *
      * @return The properties map
      */
-    @Deprecated
     public Map<String, ? extends Property<?>> getPropertyMap() {
         return this.settings.propertiesMap;
     }
@@ -140,9 +134,8 @@ public class BlockType implements FawePattern, Keyed {
      *
      * @return the properties
      */
-    @Deprecated
     public List<? extends Property<?>> getProperties() {
-        return this.settings.propertiesList;
+        return ImmutableList.copyOf(this.getPropertyMap().values());
     }
 
     @Deprecated
@@ -156,16 +149,15 @@ public class BlockType implements FawePattern, Keyed {
      * @param name The name
      * @return The property
      */
-    @Deprecated
     public <V> Property<V> getProperty(String name) {
-        return (Property<V>) this.settings.propertiesMap.get(name);
+        return (Property<V>) this.settings.propertiesMap.get(name);  // stop changing this (performance)
     }
 
     public boolean hasProperty(PropertyKey key) {
         int ordinal = key.ordinal();
         return this.settings.propertiesMapArr.length > ordinal ? this.settings.propertiesMapArr[ordinal] != null : false;
     }
-    
+
     public <V> Property<V> getProperty(PropertyKey key) {
         try {
             return (Property<V>) this.settings.propertiesMapArr[key.ordinal()];
@@ -188,7 +180,7 @@ public class BlockType implements FawePattern, Keyed {
      * @return
      */
     @Deprecated
-    public FuzzyBlockState getFuzzyMatcher() { //
+    public FuzzyBlockState getFuzzyMatcher() {
         return new FuzzyBlockState(this);
     }
 
@@ -224,7 +216,6 @@ public class BlockType implements FawePattern, Keyed {
         }
         return withStateId(id);
     }
-
 
     /**
      * Gets whether this block type has an item representation.
@@ -265,6 +256,7 @@ public class BlockType implements FawePattern, Keyed {
      *
      * @return legacy id or 0, if unknown
      */
+    @Deprecated
     public int getLegacyCombinedId() {
         Integer combinedId = LegacyMapper.getInstance().getLegacyCombined(this);
         return combinedId == null ? 0 : combinedId;
@@ -282,20 +274,20 @@ public class BlockType implements FawePattern, Keyed {
     }
 
     @Override
+    public String toString() {
+        return getId();
+    }
+
+    @Override
     public int hashCode() {
-        return settings.internalId;
+        return settings.internalId; // stop changing this to WEs bad hashcode
     }
 
     @Override
     public boolean equals(Object obj) {
-        return obj == this;
+        return obj == this; // stop changing this to a shitty string comparison
     }
-    
-    @Override
-    public String toString() {
-        return getId();
-    }
-    
+
 
     @Override
     public boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {

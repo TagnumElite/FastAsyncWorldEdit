@@ -32,6 +32,7 @@ import java.util.List;
 /**
  * Utility class to apply region functions to {@link com.sk89q.worldedit.regions.Region}.
  */
+@Deprecated
 public class RegionVisitor implements Operation {
 
     public final Region region;
@@ -45,7 +46,6 @@ public class RegionVisitor implements Operation {
      * @param region
      * @param function
      */
-    @Deprecated
     public RegionVisitor(Region region, RegionFunction function) {
         this((Iterable<BlockVector3>) region, function);
     }

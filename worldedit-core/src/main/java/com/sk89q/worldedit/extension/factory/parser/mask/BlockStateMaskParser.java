@@ -35,6 +35,14 @@ public class BlockStateMaskParser extends InputParser<Mask> {
     }
 
     @Override
+    public Stream<String> getSuggestions(String input) {
+        if (input.isEmpty()) {
+            return Stream.of("^[", "^=[");
+        }
+        return Stream.of("^[", "^=[").filter(s -> s.startsWith(input)); // no block type, can't suggest states
+    }
+
+    @Override
     public Mask parseFromInput(String input, ParserContext context) throws InputParseException {
         if (!(input.startsWith("^[") || input.startsWith("^=[")) || !input.endsWith("]")) {
             return null;

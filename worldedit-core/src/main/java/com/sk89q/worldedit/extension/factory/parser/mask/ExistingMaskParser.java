@@ -31,13 +31,15 @@ import java.util.List;
 
 public class ExistingMaskParser extends SimpleInputParser<Mask> {
 
+    private final List<String> aliases = ImmutableList.of("#existing");
+
     public ExistingMaskParser(WorldEdit worldEdit) {
         super(worldEdit);
     }
 
     @Override
     public List<String> getMatchedAliases() {
-        return Lists.newArrayList("#existing");
+        return aliases;
     }
 
     @Override

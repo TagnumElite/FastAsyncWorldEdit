@@ -135,18 +135,6 @@ public class FaweBukkit implements IFawe, Listener {
                 new ChunkListener_9();
             }
 
-            try {
-                Class.forName("com.destroystokyo.paper.event.server.AsyncTabCompleteEvent");
-                Bukkit.getPluginManager().registerEvents(new AsyncTabCompleteListener(WorldEditPlugin.getInstance()), plugin);
-            } catch (Throwable ignore) {
-                debug("====== USE PAPER ======");
-                debug("DOWNLOAD: https://papermc.io/ci/job/Paper-1.13/");
-                debug("GUIDE: https://www.spigotmc.org/threads/21726/");
-                debug(" - This is only a recommendation");
-                debug(" - Allows the use of Async Tab Completetion as provided by Paper");
-                debug("==============================");
-                Bukkit.getPluginManager().registerEvents(new SyncTabCompleteListener(WorldEditPlugin.getInstance()), plugin);
-            }
         });
     }
 
@@ -426,7 +414,7 @@ public class FaweBukkit implements IFawe, Listener {
     public Collection<FaweMaskManager> getMaskManagers() {
         final Plugin worldguardPlugin = Bukkit.getServer().getPluginManager().getPlugin("WorldGuard");
         final ArrayList<FaweMaskManager> managers = new ArrayList<>();
-        if ((worldguardPlugin != null) && worldguardPlugin.isEnabled()) {
+        if (worldguardPlugin != null && worldguardPlugin.isEnabled()) {
             try {
                 managers.add(new Worldguard(worldguardPlugin, this));
                 managers.add(new WorldguardFlag(worldguardPlugin, this));
@@ -436,7 +424,7 @@ public class FaweBukkit implements IFawe, Listener {
             }
         }
         final Plugin townyPlugin = Bukkit.getServer().getPluginManager().getPlugin("Towny");
-        if ((townyPlugin != null) && townyPlugin.isEnabled()) {
+        if (townyPlugin != null && townyPlugin.isEnabled()) {
             try {
                 managers.add(new TownyFeature(townyPlugin, this));
                 Fawe.debug("Plugin 'Towny' found. Using it now.");
@@ -445,7 +433,7 @@ public class FaweBukkit implements IFawe, Listener {
             }
         }
         final Plugin factionsPlugin = Bukkit.getServer().getPluginManager().getPlugin("Factions");
-        if ((factionsPlugin != null) && factionsPlugin.isEnabled()) {
+        if (factionsPlugin != null && factionsPlugin.isEnabled()) {
             try {
                 managers.add(new FactionsFeature(factionsPlugin));
                 Fawe.debug("Plugin 'Factions' found. Using it now.");
@@ -465,7 +453,7 @@ public class FaweBukkit implements IFawe, Listener {
             }
         }
         final Plugin residencePlugin = Bukkit.getServer().getPluginManager().getPlugin("Residence");
-        if ((residencePlugin != null) && residencePlugin.isEnabled()) {
+        if (residencePlugin != null && residencePlugin.isEnabled()) {
             try {
                 managers.add(new ResidenceFeature(residencePlugin, this));
                 Fawe.debug("Plugin 'Residence' found. Using it now.");
@@ -474,7 +462,7 @@ public class FaweBukkit implements IFawe, Listener {
             }
         }
         final Plugin griefpreventionPlugin = Bukkit.getServer().getPluginManager().getPlugin("GriefPrevention");
-        if ((griefpreventionPlugin != null) && griefpreventionPlugin.isEnabled()) {
+        if (griefpreventionPlugin != null && griefpreventionPlugin.isEnabled()) {
             try {
                 managers.add(new GriefPreventionFeature(griefpreventionPlugin));
                 Fawe.debug("Plugin 'GriefPrevention' found. Using it now.");
@@ -483,7 +471,7 @@ public class FaweBukkit implements IFawe, Listener {
             }
         }
         final Plugin preciousstonesPlugin = Bukkit.getServer().getPluginManager().getPlugin("PreciousStones");
-        if ((preciousstonesPlugin != null) && preciousstonesPlugin.isEnabled()) {
+        if (preciousstonesPlugin != null && preciousstonesPlugin.isEnabled()) {
             try {
                 managers.add(new PreciousStonesFeature(preciousstonesPlugin, this));
                 Fawe.debug("Plugin 'PreciousStones' found. Using it now.");
@@ -494,7 +482,7 @@ public class FaweBukkit implements IFawe, Listener {
 
 
         final Plugin aSkyBlock = Bukkit.getServer().getPluginManager().getPlugin("ASkyBlock");
-        if ((aSkyBlock != null) && aSkyBlock.isEnabled()) {
+        if (aSkyBlock != null && aSkyBlock.isEnabled()) {
             try {
                 managers.add(new ASkyBlockHook(aSkyBlock));
                 Fawe.debug("Plugin 'ASkyBlock' found. Using it now.");
@@ -513,20 +501,6 @@ public class FaweBukkit implements IFawe, Listener {
 
         return managers;
     }
-//
-//    @EventHandler
-//    public void onWorldLoad(WorldLoadEvent event) {
-//        org.bukkit.World world = event.getWorld();
-//        world.setKeepSpawnInMemory(false);
-//        WorldServer nmsWorld = ((CraftWorld) world).getHandle();
-//        ChunkProviderServer provider = nmsWorld.getChunkProviderServer();
-//        try {
-//            Field fieldChunkLoader = provider.getClass().getDeclaredField("chunkLoader");
-//            ReflectionUtils.setFailsafeFieldValue(fieldChunkLoader, provider, new FaweChunkLoader());
-//        } catch (Throwable e) {
-//            e.printStackTrace();
-//        }
-//    }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerQuit(PlayerQuitEvent event) {

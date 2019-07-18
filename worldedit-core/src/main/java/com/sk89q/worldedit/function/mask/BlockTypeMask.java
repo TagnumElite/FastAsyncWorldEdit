@@ -39,7 +39,7 @@ import java.util.Set;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 @Deprecated
-public class BlockTypeMask extends AbstractExtentMask {
+public final class BlockTypeMask extends AbstractExtentMask {
 
     private final boolean[] types;
 

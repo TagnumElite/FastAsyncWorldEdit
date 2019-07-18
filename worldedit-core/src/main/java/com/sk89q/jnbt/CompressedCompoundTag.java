@@ -19,7 +19,7 @@ public abstract class CompressedCompoundTag<T> extends CompoundTag {
         return super.getValue();
     }
 
-    public abstract DataInputStream adapt(T src) throws IOException;
+    public abstract LZ4BlockInputStream adapt(T src) throws IOException;
 
     public T getSource() {
         return in;

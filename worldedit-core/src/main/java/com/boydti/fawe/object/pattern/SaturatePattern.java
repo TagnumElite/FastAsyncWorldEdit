@@ -26,7 +26,7 @@ public class SaturatePattern extends AbstractPattern {
 
     @Override
     public BaseBlock apply(BlockVector3 position) {
-        BlockType block = extent.getBlockType(position);
+        BlockType block = extent.getBlock(position).getBlockType();
         TextureUtil util = holder.getTextureUtil();
         int currentColor = util.getColor(block);
         int newColor = util.multiplyColor(currentColor, color);

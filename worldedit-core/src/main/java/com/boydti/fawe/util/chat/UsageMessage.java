@@ -57,7 +57,7 @@ public class UsageMessage extends Message {
         String prefix = !commandString.isEmpty() ? commandString + " " : "";
 
         List<CommandMapping> list = new ArrayList<>(dispatcher.getCommands());
-        list.sort(new PrimaryAliasComparator(CommandManager.COMMAND_CLEAN_PATTERN));
+        list.sort(new PrimaryAliasComparator(PlatformCommandManager.COMMAND_CLEAN_PATTERN));
 
         for (CommandMapping mapping : list) {
             boolean perm = locals == null || mapping.getCallable().testPermission(locals);

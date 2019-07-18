@@ -182,7 +182,7 @@ public class CylinderRegionSelector implements RegionSelector, CUIRegion {
         if (!center.equals(Vector3.ZERO)) {
             BBC.SELECTOR_RADIUS.send(player, NUMBER_FORMAT.format(region.getRadius().getX()) + "/" + NUMBER_FORMAT.format(region.getRadius().getZ()), region.getArea());
         } else {
-            BBC.SELECTION_WAND.send(player);
+            player.printError("You must select the center point before setting the radius.");
             return;
         }
 
@@ -283,6 +283,5 @@ public class CylinderRegionSelector implements RegionSelector, CUIRegion {
     public String getLegacyTypeID() {
         return "cuboid";
     }
-
 
 }

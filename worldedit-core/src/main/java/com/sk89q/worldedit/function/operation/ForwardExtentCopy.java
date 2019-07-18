@@ -74,12 +74,12 @@ public class ForwardExtentCopy implements Operation {
     private int repetitions = 1;
     private Mask sourceMask = Masks.alwaysTrue();
     private boolean removingEntities;
+    private boolean copyingEntities = true; // default to true for backwards compatibility, sort of // No, it's not for compatibility, it makes sense for entities to be copied and people will get annoyed if it doesn't
+    private boolean copyingBiomes;
     private RegionFunction sourceFunction = null;
     private Transform transform = new Identity();
     private Transform currentTransform = null;
     private int affected;
-    private boolean copyEntities = true;
-    private boolean copyBiomes = false;
     private RegionFunction filterFunction;
 
     /**
@@ -120,7 +120,7 @@ public class ForwardExtentCopy implements Operation {
 
     /**
      * Get the transformation that will occur on every point.
-     * <p>
+     *
      * <p>The transformation will stack with each repetition.</p>
      *
      * @return a transformation
@@ -142,39 +142,13 @@ public class ForwardExtentCopy implements Operation {
 
     /**
      * Get the mask that gets applied to the source extent.
-     * <p>
+     *
      * <p>This mask can be used to filter what will be copied from the source.</p>
      *
      * @return a source mask
      */
     public Mask getSourceMask() {
         return sourceMask;
-    }
-
-    /**
-     * Set whether entities should be copied along with blocks.
-     *
-     * @param copyEntities true if copying
-     */
-    public void setCopyingEntities(boolean copyEntities) {
-        this.copyEntities = copyEntities;
-    }
-
-    /**
-     * Return whether entities should be copied along with blocks.
-     *
-     * @return true if copying
-     */
-    public boolean isCopyingEntities() {
-        return copyEntities;
-    }
-
-    public void setCopyBiomes(boolean copyBiomes) {
-        this.copyBiomes = copyBiomes;
-    }
-
-    public boolean isCopyBiomes() {
-        return copyBiomes;
     }
 
     /**
@@ -186,10 +160,6 @@ public class ForwardExtentCopy implements Operation {
     public void setSourceMask(Mask sourceMask) {
         checkNotNull(sourceMask);
         this.sourceMask = sourceMask;
-    }
-
-    public void setFilterFunction(RegionFunction filterFunction) {
-        this.filterFunction = filterFunction;
     }
 
     /**
@@ -208,7 +178,6 @@ public class ForwardExtentCopy implements Operation {
      *
      * @param function a source function, or null if none is to be applied
      */
-    @Deprecated
     public void setSourceFunction(RegionFunction function) {
         this.sourceFunction = function;
     }
@@ -233,6 +202,24 @@ public class ForwardExtentCopy implements Operation {
     }
 
     /**
+     * Return whether entities should be copied along with blocks.
+     *
+     * @return true if copying
+     */
+    public boolean isCopyingEntities() {
+        return copyingEntities;
+    }
+
+    /**
+     * Set whether entities should be copied along with blocks.
+     *
+     * @param copyingEntities true if copying
+     */
+    public void setCopyingEntities(boolean copyingEntities) {
+        this.copyingEntities = copyingEntities;
+    }
+
+    /**
      * Return whether entities that are copied should be removed.
      *
      * @return true if removing
@@ -248,6 +235,27 @@ public class ForwardExtentCopy implements Operation {
      */
     public void setRemovingEntities(boolean removingEntities) {
         this.removingEntities = removingEntities;
+    }
+
+    /**
+     * Return whether biomes should be copied along with blocks.
+     *
+     * @return true if copying biomes
+     */
+    public boolean isCopyingBiomes() {
+        return copyingBiomes;
+    }
+
+    /**
+     * Set whether biomes should be copies along with blocks.
+     *
+     * @param copyingBiomes true if copying
+     */
+    public void setCopyingBiomes(boolean copyingBiomes) {
+        if (copyingBiomes && !(region instanceof FlatRegion)) {
+            throw new UnsupportedOperationException("Can't copy biomes from region that doesn't implement FlatRegion");
+        }
+        this.copyingBiomes = copyingBiomes;
     }
 
     /**
@@ -298,7 +306,7 @@ public class ForwardExtentCopy implements Operation {
                     new MaskTraverser(sourceMask).reset(transExt);
                     copy = new RegionMaskingFilter(sourceMask, copy);
                 }
-                if (copyBiomes && (!(source instanceof BlockArrayClipboard) || ((BlockArrayClipboard) source).IMP.hasBiomes())) {
+                if (copyingBiomes && (!(source instanceof BlockArrayClipboard) || ((BlockArrayClipboard) source).IMP.hasBiomes())) {
                     copy = CombinedRegionFunction.combine(copy, new BiomeCopy(source, finalDest));
                 }
                 blockCopy = new BackwardsExtentBlockCopy(region, from, transform, copy);
@@ -352,14 +360,14 @@ public class ForwardExtentCopy implements Operation {
                 if (maskFunc != null) copy = new RegionMaskTestFunction(sourceMask, copy, maskFunc);
                 else copy = new RegionMaskingFilter(sourceMask, copy);
             }
-            if (copyBiomes && (!(source instanceof BlockArrayClipboard) || ((BlockArrayClipboard) source).IMP.hasBiomes())) {
+            if (copyingBiomes && (!(source instanceof BlockArrayClipboard) || ((BlockArrayClipboard) source).IMP.hasBiomes())) {
                 copy = CombinedRegionFunction.combine(copy, new BiomeCopy(source, finalDest));
             }
             blockCopy = new RegionVisitor(region, copy, queue instanceof MappedFaweQueue ? (MappedFaweQueue) queue : null);
         }
 
         List<? extends Entity> entities;
-        if (isCopyingEntities()) {
+        if (copyingEntities) {
             // filter players since they can't be copied
             entities = source.getEntities(region)
                     .stream()
@@ -376,6 +384,11 @@ public class ForwardExtentCopy implements Operation {
             if (!entities.isEmpty()) {
                 ExtentEntityCopy entityCopy = new ExtentEntityCopy(from.toVector3(), destination, to.toVector3(), currentTransform);
                 entityCopy.setRemoving(removingEntities);
+                List<? extends Entity> entities2 = Lists.newArrayList(source.getEntities(region));
+                entities2.removeIf(entity -> {
+                    EntityProperties properties = entity.getFacet(EntityProperties.class);
+                    return properties != null && !properties.isPasteable();
+                });
                 EntityVisitor entityVisitor = new EntityVisitor(entities.iterator(), entityCopy);
                 Operations.completeBlindly(entityVisitor);
             }
@@ -396,7 +409,10 @@ public class ForwardExtentCopy implements Operation {
 
     @Override
     public void addStatusMessages(List<String> messages) {
+        StringBuilder msg = new StringBuilder();
+        msg.append(affected).append(" objects(s)");
+        msg.append(" affected.");
+        messages.add(msg.toString());
     }
-
 
 }

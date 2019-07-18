@@ -31,8 +31,9 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.PARAMETER)
+@InjectAnnotation
 public @interface Direction {
-    
+
     String AIM = "me";
 
     boolean includeDiagonals() default false;

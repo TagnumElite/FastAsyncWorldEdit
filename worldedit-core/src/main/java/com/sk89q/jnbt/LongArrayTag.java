@@ -48,7 +48,7 @@ public class LongArrayTag extends Tag {
     public String toString() {
         StringBuilder hex = new StringBuilder();
         for (long b : value) {
-            String hexDigits = Long.toHexString(b).toUpperCase();
+            String hexDigits = Long.toHexString(b).toUpperCase(Locale.ROOT);
             if (hexDigits.length() == 1) {
                 hex.append("0");
             }

@@ -65,6 +65,14 @@ public interface BlockRegistry {
     Map<String, ? extends Property<?>> getProperties(BlockType blockType);
 
     /**
+     * Retrieve the internal ID for a given state, if possible.
+     *
+     * @param state The block state
+     * @return the internal ID of the state
+     */
+    OptionalInt getInternalBlockStateId(BlockState state);
+
+    /**
      * Register all blocks
      */
     default Collection<String> registerBlocks() {

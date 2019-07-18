@@ -71,7 +71,7 @@ public class VoxelSniperListener implements Listener {
 
         FawePlayer fp = FawePlayer.wrap(player);
         if (!fp.runAction(() -> {
-            ExceptionConverter exceptionConverter = CommandManager.getInstance().getExceptionConverter();
+            ExceptionConverter exceptionConverter = PlatformCommandManager.getInstance().getExceptionConverter();
             try {
                 try {
                     found.onCommand(player, split);

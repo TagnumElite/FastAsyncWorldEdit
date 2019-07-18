@@ -38,6 +38,18 @@ public class OffsetMaskParser extends InputParser<Mask> {
     }
 
     @Override
+    public Stream<String> getSuggestions(String input) {
+        if (input.isEmpty()) {
+            return Stream.of(">", "<");
+        }
+        final char firstChar = input.charAt(0);
+        if (firstChar != '>' && firstChar != '<') {
+            return Stream.empty();
+        }
+        return worldEdit.getMaskFactory().getSuggestions(input.substring(1)).stream().map(s -> firstChar + s);
+    }
+
+    @Override
     public Mask parseFromInput(String input, ParserContext context) throws InputParseException {
         final char firstChar = input.charAt(0);
         if (firstChar != '>' && firstChar != '<') {

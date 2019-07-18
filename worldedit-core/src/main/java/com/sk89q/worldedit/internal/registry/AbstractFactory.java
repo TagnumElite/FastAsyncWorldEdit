@@ -45,10 +45,13 @@ public abstract class AbstractFactory<E> {
      * Create a new factory.
      *
      * @param worldEdit the WorldEdit instance
+     * @param defaultParser the parser to fall back to
      */
-    protected AbstractFactory(WorldEdit worldEdit) {
+    protected AbstractFactory(WorldEdit worldEdit, InputParser<E> defaultParser) {
         checkNotNull(worldEdit);
+        checkNotNull(defaultParser);
         this.worldEdit = worldEdit;
+        this.parsers.add(defaultParser);
     }
 
     /**
@@ -76,6 +79,12 @@ public abstract class AbstractFactory<E> {
         throw new NoMatchException("No match for '" + input + "'");
     }
 
+    public List<String> getSuggestions(String input) {
+        return parsers.stream().flatMap(
+                p -> p.getSuggestions(input)
+        ).collect(Collectors.toList());
+    }
+
     /**
      * Registers an InputParser to this factory
      *
@@ -84,6 +93,6 @@ public abstract class AbstractFactory<E> {
     public void register(InputParser<E> inputParser) {
         checkNotNull(inputParser);
 
-        parsers.add(inputParser);
+        parsers.add(parsers.size() - 1, inputParser);
     }
 }

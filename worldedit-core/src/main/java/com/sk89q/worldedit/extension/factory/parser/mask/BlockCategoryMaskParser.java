@@ -35,13 +35,18 @@ public class BlockCategoryMaskParser extends InputParser<Mask> {
     }
 
     @Override
+    public Stream<String> getSuggestions(String input) {
+        return SuggestionHelper.getBlockCategorySuggestions(input, false);
+    }
+
+    @Override
     public Mask parseFromInput(String input, ParserContext context) throws InputParseException {
         if (!input.startsWith("##")) {
             return null;
         }
 
         // This means it's a tag mask.
-        BlockCategory category = BlockCategory.REGISTRY.get(input.substring(2).toLowerCase());
+        BlockCategory category = BlockCategory.REGISTRY.get(input.substring(2).toLowerCase(Locale.ROOT));
         if (category == null) {
             throw new InputParseException("Unrecognised tag '" + input.substring(2) + '\'');
         } else {

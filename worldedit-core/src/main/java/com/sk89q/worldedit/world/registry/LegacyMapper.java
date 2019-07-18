@@ -49,7 +49,7 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.Map;
 
-public class LegacyMapper {
+public final class LegacyMapper {
 
     private static final Logger log = LoggerFactory.getLogger(LegacyMapper.class);
     private static LegacyMapper INSTANCE;
@@ -66,7 +66,6 @@ public class LegacyMapper {
         try {
             loadFromResource();
         } catch (Throwable e) {
-            e.printStackTrace();
             log.warn("Failed to load the built-in legacy id registry", e);
         }
     }
@@ -80,12 +79,14 @@ public class LegacyMapper {
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapter(Vector3.class, new VectorAdapter());
         Gson gson = gsonBuilder.disableHtmlEscaping().create();
-        URL url = LegacyMapper.class.getResource("legacy.json");
+        URL url = ResourceLoader.getResource(LegacyMapper.class, "legacy.json");
         if (url == null) {
             throw new IOException("Could not find legacy.json");
         }
         String source = Resources.toString(url, Charset.defaultCharset());
         LegacyDataFile dataFile = gson.fromJson(source, new TypeToken<LegacyDataFile>() {}.getType());
+
+        DataFixer fixer = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).getDataFixer();
         ParserContext parserContext = new ParserContext();
         parserContext.setPreferringWildcard(false);
         parserContext.setRestricted(false);
@@ -93,7 +94,7 @@ public class LegacyMapper {
 
         for (Map.Entry<String, String> blockEntry : dataFile.blocks.entrySet()) {
             try {
-                BlockStateHolder blockState = BlockState.get(null, blockEntry.getValue());
+                BlockState blockState = BlockState.get(null, blockEntry.getValue());
                 BlockType type = blockState.getBlockType();
                 if (type.hasProperty(PropertyKey.WATERLOGGED)) {
                     blockState = blockState.with(PropertyKey.WATERLOGGED, false);
@@ -103,7 +104,7 @@ public class LegacyMapper {
 
                 blockStateToLegacyId4Data.put(blockState.getInternalId(), (Integer) combinedId);
                 blockStateToLegacyId4Data.putIfAbsent(blockState.getInternalBlockTypeId(), combinedId);
-            } catch (Exception e) {
+            } catch (InputParseException e) {
                 log.warn("Unknown block: " + blockEntry.getValue());
             }
         }
@@ -143,7 +144,12 @@ public class LegacyMapper {
 
     public BlockState getBlockFromLegacy(String input) {
         if (input.startsWith("minecraft:")) input = input.substring(10);
-        return BlockState.getFromInternalId(blockArr[getCombinedId(input)]);
+        try {
+            return BlockState.getFromInternalId(blockArr[getCombinedId(input)]);
+        } catch (InputParseException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     @Nullable
@@ -186,7 +192,11 @@ public class LegacyMapper {
             try {
                 int internalId = blockArr[combinedId];
                 if (internalId == 0) return null;
-                return BlockState.getFromInternalId(internalId);
+                try {
+                    return BlockState.getFromInternalId(internalId);
+                } catch (InputParseException e) {
+                    e.printStackTrace();
+                }
             } catch (IndexOutOfBoundsException ignore) {
                 return null;
             }
@@ -196,7 +206,11 @@ public class LegacyMapper {
             extra = extraId4DataToStateId.get(combinedId & 0xFF0);
         }
         if (extra != null) {
-            return BlockState.getFromInternalId(extra);
+            try {
+                return BlockState.getFromInternalId(extra);
+            } catch (InputParseException e) {
+                e.printStackTrace();
+            }
         }
         return null;
     }
@@ -229,7 +243,7 @@ public class LegacyMapper {
     	if(plotBlock instanceof StringPlotBlock) {
     		try {
     			return BlockTypes.get(plotBlock.toString()).getDefaultState().toBaseBlock();
-    		}catch(Throwable failed) {
+    		} catch (Throwable failed) {
     			log.error("Unable to convert StringPlotBlock " + plotBlock + " to BaseBlock!");
     			failed.printStackTrace();
     			return null;
@@ -237,7 +251,7 @@ public class LegacyMapper {
     	}else if(plotBlock instanceof LegacyPlotBlock) {
     		try {
     			return BaseBlock.getState(((LegacyPlotBlock)plotBlock).getId(), ((LegacyPlotBlock)plotBlock).getData()).toBaseBlock();
-    		}catch(Throwable failed) {
+    		} catch (Throwable failed) {
     			log.error("Unable to convert LegacyPlotBlock " + plotBlock + " to BaseBlock!");
     			failed.printStackTrace();
     			return null;

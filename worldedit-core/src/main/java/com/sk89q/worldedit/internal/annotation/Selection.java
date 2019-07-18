@@ -29,6 +29,6 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.PARAMETER)
+@InjectAnnotation
 public @interface Selection {
-
 }

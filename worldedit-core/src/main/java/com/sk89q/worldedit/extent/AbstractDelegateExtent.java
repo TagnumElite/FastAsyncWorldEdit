@@ -73,7 +73,6 @@ public class AbstractDelegateExtent implements Extent, LightingExtent {
     /*
     Bounds
      */
-
     @Override
     public BlockVector3 getMinimumPoint() {
         return extent.getMinimumPoint();
@@ -121,7 +120,6 @@ public class AbstractDelegateExtent implements Extent, LightingExtent {
     /*
     Light
      */
-
     public int getSkyLight(int x, int y, int z) {
         if (extent instanceof LightingExtent) {
             return ((LightingExtent) extent).getSkyLight(x, y, z);

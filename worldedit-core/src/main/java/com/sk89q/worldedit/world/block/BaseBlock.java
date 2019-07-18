@@ -45,7 +45,8 @@ import java.util.Objects;
  * snapshot of blocks correctly, so, for example, the NBT data for a block
  * may be missing.</p>
  */
-public class BaseBlock implements BlockStateHolder<BaseBlock> {
+public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
+
     private final BlockState blockState;
     private final CompoundTag nbtData;
 
@@ -242,26 +243,6 @@ public class BaseBlock implements BlockStateHolder<BaseBlock> {
         return this;
     }
 
-    @Override
-    public BaseBlock toBaseBlock(CompoundTag compoundTag) {
-        if (compoundTag == null) {
-            return this.blockState.toBaseBlock();
-        } else if (compoundTag == this.nbtData) {
-            return this;
-        } else {
-            return new BaseBlock(this.blockState, compoundTag);
-        }
-    }
-
-    public BlockState toBlockState() {
-        return blockState;
-    }
-
-    @Override
-    public int hashCode() {
-        return getOrdinal();
-    }
-
 	@Override
 	public boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
         set.setFullBlock(extent, this);
@@ -288,17 +269,37 @@ public class BaseBlock implements BlockStateHolder<BaseBlock> {
 		return toImmutableState().with(property, value).toBaseBlock(getNbtData());
 	}
 
-	@Override
-	public <V> V getState(PropertyKey property) {
-		return toImmutableState().getState(property);
-	}
+    @Override
+    public BaseBlock toBaseBlock(CompoundTag compoundTag) {
+        if (compoundTag == null) {
+            return this.blockState.toBaseBlock();
+        } else if (compoundTag == this.nbtData) {
+            return this;
+        } else {
+            return new BaseBlock(this.blockState, compoundTag);
+        }
+    }
+
+    @Override
+    public <V> V getState(PropertyKey property) {
+        return toImmutableState().getState(property);
+    }
+
+    @Override
+    public int hashCode() {
+        return getOrdinal();
+    }
 
     @Override
     public String toString() {
-        if (getNbtData() != null) {
-            return getAsString() + " {" + String.valueOf(getNbtData()) + "}";
-        } else {
-            return getAsString();
-        }
+//        if (getNbtData() != null) { // TODO Maybe make some JSON serialiser to make this not awful.
+//            return blockState.getAsString() + " {" + String.valueOf(getNbtData()) + "}";
+//        } else {
+            return blockState.getAsString();
+//        }
+    }
+
+    public BlockState toBlockState() {
+        return blockState;
     }
 }

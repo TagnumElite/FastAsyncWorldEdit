@@ -30,7 +30,7 @@ import java.util.Set;
  * A category of blocks. This is due to the splitting up of
  * blocks such as wool into separate ids.
  */
-public class BlockCategory extends Category<BlockType> {
+public class BlockCategory extends Category<BlockType> implements Keyed {
 
     public static final NamespacedRegistry<BlockCategory> REGISTRY = new NamespacedRegistry<>("block tag");
 

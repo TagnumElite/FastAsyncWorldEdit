@@ -33,6 +33,18 @@ public class RandomStatePatternParser extends InputParser<Pattern> {
     }
 
     @Override
+    public Stream<String> getSuggestions(String input) {
+        if (input.isEmpty()) {
+            return Stream.of("*");
+        }
+        if (!input.startsWith("*")) {
+            return Stream.empty();
+        }
+
+        return worldEdit.getBlockFactory().getSuggestions(input.substring(1)).stream().map(s -> "*" + s);
+    }
+
+    @Override
     public Pattern parseFromInput(String input, ParserContext context) throws InputParseException {
         if (!input.startsWith("*")) {
             return null;
@@ -44,7 +56,9 @@ public class RandomStatePatternParser extends InputParser<Pattern> {
         context.setPreferringWildcard(wasFuzzy);
         if (block.getStates().size() == block.getBlockType().getPropertyMap().size()) {
             // they requested random with *, but didn't leave any states empty - simplify
-            return (block);
+            return block;
+        } else if (block.toImmutableState() instanceof FuzzyBlockState) {
+            return new RandomStatePattern((FuzzyBlockState) block.toImmutableState());
         } else {
             return null; // only should happen if parseLogic changes
         }

@@ -42,7 +42,7 @@ public abstract class ChunkStore implements Closeable {
     /**
      * The DataVersion for Minecraft 1.13
      */
-    public static final int DATA_VERSION_MC_1_13 = 1519;
+    private static final int DATA_VERSION_MC_1_13 = 1519;
 
     /**
      * {@code >>} - to chunk
@@ -102,6 +102,15 @@ public abstract class ChunkStore implements Closeable {
         }
 
         int dataVersion = rootTag.getInt("DataVersion");
+        if (dataVersion == 0) dataVersion = -1;
+        final Platform platform = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING);
+        final int currentDataVersion = platform.getDataVersion();
+        if (tag.getValue().containsKey("Sections") &&  dataVersion < currentDataVersion) { // only fix up MCA format, DFU doesn't support MCR chunks
+            final DataFixer dataFixer = platform.getDataFixer();
+            if (dataFixer != null) {
+                return new AnvilChunk13((CompoundTag) dataFixer.fixUp(DataFixer.FixTypes.CHUNK, rootTag, dataVersion).getValue().get("Level"));
+            }
+        }
         if (dataVersion >= DATA_VERSION_MC_1_13) {
             return new AnvilChunk13(tag);
         }
@@ -114,6 +123,7 @@ public abstract class ChunkStore implements Closeable {
         return new OldChunk(world, tag);
     }
 
+    @Override
     public void close() throws IOException {
     }
 

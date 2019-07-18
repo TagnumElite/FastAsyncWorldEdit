@@ -57,7 +57,7 @@ public class ReplaceAll extends Command {
                 FakePlayer actor = FakePlayer.getConsole();
                 String cmd = "/replaceallpattern " + worldName + " " + StringMan.join(args, " ");
                 CommandEvent event = new CommandEvent(actor, cmd);
-                CommandManager.getInstance().handleCommandOnCurrentThread(event);
+                PlatformCommandManager.getInstance().handleCommandOnCurrentThread(event);
                 TaskManager.IMP.sync(new RunnableVal<Object>() {
                     @Override
                     public void run(Object value) {

@@ -33,8 +33,13 @@ public class SingleBlockPatternParser extends InputParser<Pattern> {
     }
 
     @Override
+    public Stream<String> getSuggestions(String input) {
+        return worldEdit.getBlockFactory().getSuggestions(input).stream();
+    }
+
+    @Override
     public Pattern parseFromInput(String input, ParserContext context) throws InputParseException {
-        return (worldEdit.getBlockFactory().parseFromInput(input, context));
+        return worldEdit.getBlockFactory().parseFromInput(input, context);
     }
 
 }

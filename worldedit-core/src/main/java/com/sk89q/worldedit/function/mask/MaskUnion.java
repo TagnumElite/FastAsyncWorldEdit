@@ -61,7 +61,9 @@ public class MaskUnion extends MaskIntersection {
 
     @Override
     public boolean test(BlockVector3 vector) {
-        for (Mask mask : getMasksArray()) {
+        Mask[] masks = getMasksArray();
+
+        for (Mask mask : masks) {
             if (mask.test(vector)) {
                 return true;
             }
