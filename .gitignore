@@ -24,3 +24,9 @@ worldedit-bukkit/src/main/java/ignore/*
 todo.txt
 mvn/*
 docs/
+/favs/FastAsyncWorldEdit.favs.eml
+/favs/src/main/FastAsyncWorldEdit.favs.main.eml
+/worldedit-bukkit/src/main/FastAsyncWorldEdit.worldedit-bukkit.main.eml
+/worldedit-bukkit/src/test/FastAsyncWorldEdit.worldedit-bukkit.test.eml
+/worldedit-core/src/main/java/com/sk89q/worldedit/blocks/ClothColor.java
+/worldedit-core/src/test/FastAsyncWorldEdit.worldedit-core.test.eml
