@@ -25,8 +25,8 @@ fun Project.applyPlatformAndCoreConfiguration() {
     apply(plugin = "maven")
     apply(plugin = "checkstyle")
     apply(plugin = "com.github.johnrengelman.shadow")
-    apply(plugin = "com.jfrog.artifactory")
-    apply(plugin = "net.minecrell.licenser")
+//    apply(plugin = "com.jfrog.artifactory")
+//    apply(plugin = "net.minecrell.licenser")
 
     ext["internalVersion"] = "$version;${rootProject.ext["gitCommitHash"]}"
 
@@ -79,12 +79,12 @@ fun Project.applyPlatformAndCoreConfiguration() {
         dependsOn("checkstyleMain", "checkstyleTest")
     }
 
-    applyCommonArtifactoryConfig()
+//    applyCommonArtifactoryConfig()
 
-    configure<LicenseExtension> {
-        header = rootProject.file("HEADER.txt")
-        include("**/*.java")
-    }
+//    configure<LicenseExtension> {
+//        header = rootProject.file("HEADER.txt")
+//        include("**/*.java")
+//    }
 }
 
 fun Project.applyShadowConfiguration() {
