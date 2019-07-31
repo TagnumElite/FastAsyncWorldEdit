@@ -6,16 +6,16 @@ import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.api.plugins.quality.CheckstyleExtension
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.javadoc.Javadoc
+import org.gradle.api.tasks.testing.Test
 import org.gradle.external.javadoc.CoreJavadocOptions
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.configure
+import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.getByName
-import org.gradle.kotlin.dsl.getPlugin
-import org.gradle.kotlin.dsl.register
-import org.gradle.kotlin.dsl.the
-import org.gradle.kotlin.dsl.withType
 import org.gradle.kotlin.dsl.named
+import org.gradle.kotlin.dsl.register
+import org.gradle.kotlin.dsl.withType
 
 fun Project.applyPlatformAndCoreConfiguration() {
     applyCommonConfiguration()
@@ -38,6 +38,15 @@ fun Project.applyPlatformAndCoreConfiguration() {
     configure<CheckstyleExtension> {
         configFile = rootProject.file("config/checkstyle/checkstyle.xml")
         toolVersion = "7.6.1"
+    }
+
+    tasks.withType<Test>().configureEach {
+        useJUnitPlatform()
+    }
+
+    dependencies {
+        "testImplementation"("org.junit.jupiter:junit-jupiter-api:${Versions.JUNIT}")
+        "testRuntime"("org.junit.jupiter:junit-jupiter-engine:${Versions.JUNIT}")
     }
 
     // Java 8 turns on doclint which we fail
@@ -64,7 +73,7 @@ fun Project.applyPlatformAndCoreConfiguration() {
         tasks.register<Jar>("sourcesJar") {
             dependsOn("classes")
             archiveClassifier.set("sources")
-            from(project.the<JavaPluginConvention>().sourceSets["main"].allSource)
+            from(sourceSets["main"].allSource)
         }
 
         artifacts {

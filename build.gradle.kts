@@ -1,6 +1,6 @@
 import org.ajoberstar.grgit.Grgit
 
-println("""
+logger.lifecycle("""
 *******************************************
  You are building WorldEdit!
 
@@ -14,14 +14,14 @@ println("""
 *******************************************
 """)
 
-applyRootArtifactoryConfig()
+//applyRootArtifactoryConfig()
 
 if (!project.hasProperty("gitCommitHash")) {
     apply(plugin = "org.ajoberstar.grgit")
     ext["gitCommitHash"] = try {
-        (ext["grgit"] as Grgit).head().abbreviatedId
+        (ext["grgit"] as Grgit?)?.head()?.abbreviatedId
     } catch (e: Exception) {
-        println("Error getting commit hash: " + e.message)
+        logger.warn("Error getting commit hash", e)
 
         "no_git_id"
     }

@@ -37,7 +37,7 @@ import java.util.UUID;
 public class TestOfflinePermissible implements OfflinePlayer, Permissible {
     private boolean op;
     private UUID randomUuid = UUID.randomUUID();
-    
+
     private final Map<String, Boolean> assignedPermissions = new HashMap<>();
 
     @Override
@@ -52,7 +52,7 @@ public class TestOfflinePermissible implements OfflinePlayer, Permissible {
 
     @Override
     public boolean isPermissionSet(String s) {
-        return assignedPermissions.containsKey(s.toLowerCase());
+        return assignedPermissions.containsKey(s.toLowerCase(Locale.ROOT));
     }
 
     @Override
@@ -63,7 +63,7 @@ public class TestOfflinePermissible implements OfflinePlayer, Permissible {
     @Override
     public boolean hasPermission(String s) {
         if (isPermissionSet(s)) {
-            return assignedPermissions.get(s.toLowerCase());
+            return assignedPermissions.get(s.toLowerCase(Locale.ROOT));
         }
         return false;
     }
@@ -111,19 +111,19 @@ public class TestOfflinePermissible implements OfflinePlayer, Permissible {
         }
         return ret;
     }
-    
+
     public void setPermission(String permission, boolean value) {
-        assignedPermissions.put(permission.toLowerCase(), value);
+        assignedPermissions.put(permission.toLowerCase(Locale.ROOT), value);
     }
-    
+
     public void unsetPermission(String permission) {
-        assignedPermissions.remove(permission.toLowerCase());
+        assignedPermissions.remove(permission.toLowerCase(Locale.ROOT));
     }
 
     public void clearPermissions() {
         assignedPermissions.clear();
     }
-    
+
     // -- Unneeded OfflinePlayer methods
 
     @Override
